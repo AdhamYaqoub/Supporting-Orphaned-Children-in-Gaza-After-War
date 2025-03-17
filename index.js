@@ -1,27 +1,20 @@
-// استيراد المكتبات
-const express = require('express');
-const sequelize = require('./src/config/database');
-const userRoutes = require('./src/routes/user.routes'); // تأكد من استيراد المسارات بشكل صحيح
+const express = require("express");
+const app = express();
+const dashboardRoutes = require("./src/routes/dashboard.routes");
+const authRoutes = require("./src/routes/auth.routes");
+const usersRoutes = require("./src/routes/user.routes");
+const notificationsRoutes = require("./src/routes/notifications.routes");
 
-const start = async () => {
-  try {
-    // الاتصال بقاعدة البيانات
-    await sequelize.authenticate();
-    console.log('✅ Database connected successfully!');
+app.use(express.json());
 
-    await sequelize.sync({ force: false });
-    console.log('✅ All tables created successfully!');
+// إضافة المسارات
+app.use("/api/users", usersRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/notifications", notificationsRoutes);
 
-    const app = express();
-    app.use(express.json()); 
-
-    app.use('/api', userRoutes);
-
-    const PORT = 3000; 
-    app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
-  } catch (error) {
-    console.error('❌ Error connecting to the database:', error);
-  }
-};
-
-start();
+// الاستماع على المنفذ
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
