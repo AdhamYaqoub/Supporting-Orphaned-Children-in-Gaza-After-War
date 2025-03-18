@@ -1,27 +1,40 @@
-// استيراد المكتبات
 const express = require('express');
-const sequelize = require('./src/config/database');
-const userRoutes = require('./src/routes/user.routes'); // تأكد من استيراد المسارات بشكل صحيح
+const bodyParser = require('body-parser');
+const sequelize = require('./src/config/database'); // Import database settings
+const donationRoutes = require('./src/routes/donation.routes'); // Import donation routes
+const transactionsRoutes = require('./src/routes/transactions.routes'); // Import transactions routes
+const emergencyCampaigns = require('./src/routes/emergencyCampaigns.routes'); // Import emergencyCampaigns routes
 
-const start = async () => {
-  try {
-    // الاتصال بقاعدة البيانات
-    await sequelize.authenticate();
-    console.log('✅ Database connected successfully!');
 
-    await sequelize.sync({ force: false });
-    console.log('✅ All tables created successfully!');
+// **Import models to define them with the database**
 
-    const app = express();
-    app.use(express.json()); 
+const app = express();
 
-    app.use('/api', userRoutes);
+// **Middleware** to parse JSON data in requests
+app.use(bodyParser.json());
 
-    const PORT = 3000; 
-    app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
-  } catch (error) {
-    console.error('❌ Error connecting to the database:', error);
-  }
-};
+// **Use donation routes**
+app.use('/api', donationRoutes);
 
-start();
+// **Use transactions routes**
+app.use('/api', transactionsRoutes);
+
+// **Use Emergency Campaigns routes**
+app.use('/api', emergencyCampaigns);
+
+
+// **Test database connection**
+sequelize.authenticate()
+    .then(() => console.log('✅ Connected to the database'))
+    .catch(err => console.error('❌ Unable to connect to the database:', err));
+
+// **Sync models with the database** (preferably used only during development)
+sequelize.sync()
+    .then(() => console.log('🔄 Database synced'))
+    .catch(err => console.error('⚠️ Error syncing database:', err));
+
+// **Start the server**
+const PORT =  5000;
+app.listen(PORT, () => {
+    console.log(`🚀 Server is running on port ${PORT}`);
+});
