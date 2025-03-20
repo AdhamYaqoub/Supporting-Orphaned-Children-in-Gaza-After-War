@@ -1,37 +1,28 @@
-const express = require("express");
+const express = require("express"); // Import express
+const bodyParser = require('body-parser'); // Import body-parser
+const sequelize = require('./src/config/database'); // Import database settings
+const dashboardRoutes = require("./src/routes/dashboard.routes");  // Import dashboard routes
+const donationRoutes = require('./src/routes/donation.routes'); // Import donation routes
+const authRoutes = require("./src/routes/auth.routes"); // Import auth routes
+const usersRoutes = require("./src/routes/user.routes"); // Import users routes
+const notificationsRoutes = require("./src/routes/notifications.routes"); // Import notifications routes
+const transactionsRoutes = require('./src/routes/transactions.routes'); // Import transactions routes
+const emergencyCampaigns = require('./src/routes/emergencyCampaigns.routes'); // Import emergencyCampaigns routes
+const addtionalFeatures = require('./src/routes/additionalFeatures.routes'); // Import additionalFeatures routes
+
+// create express app
 const app = express();
-const dashboardRoutes = require("./src/routes/dashboard.routes");
-const authRoutes = require("./src/routes/auth.routes");
-const usersRoutes = require("./src/routes/user.routes");
-const notificationsRoutes = require("./src/routes/notifications.routes");
 
 app.use(express.json());
 
-// إضافة المسارات
+// add routes 
 app.use("/api/users", usersRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/notifications", notificationsRoutes);
 
-// الاستماع على المنفذ
-// const PORT = process.env.PORT || 5000;
-// app.listen(PORT, () => {
-//     console.log(`Server is running on port ${PORT}`);
-// });
 
-const express = require('express');
-const bodyParser = require('body-parser');
-const sequelize = require('./src/config/database'); // Import database settings
-const donationRoutes = require('./src/routes/donation.routes'); // Import donation routes
-const transactionsRoutes = require('./src/routes/transactions.routes'); // Import transactions routes
-const emergencyCampaigns = require('./src/routes/emergencyCampaigns.routes'); // Import emergencyCampaigns routes
-
-
-// **Import models to define them with the database**
-
-// const app = express();
-
-// **Middleware** to parse JSON data in requests
+// Middleware** to parse JSON data in requests
 app.use(bodyParser.json());
 
 // **Use donation routes**
@@ -42,6 +33,13 @@ app.use('/api', transactionsRoutes);
 
 // **Use Emergency Campaigns routes**
 app.use('/api', emergencyCampaigns);
+
+// **Use additional features routes**
+app.use('/api', addtionalFeatures);
+
+
+
+
 
 
 // **Test database connection**
