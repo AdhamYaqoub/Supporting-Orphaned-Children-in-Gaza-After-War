@@ -10,7 +10,9 @@ const User = sequelize.define('User', {
     created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
   },
   {
-    timestamps: false, // منع إنشاء createdAt و updatedAt
+    tableName: "users", // ✅ تحديد اسم الجدول لمنع تحويله إلى "Users"
+    timestamps: false,  // ✅ منع Sequelize من إضافة createdAt و updatedAt
+    underscored: true   // ✅ التأكد من استخدام snake_case
   }
 );
 

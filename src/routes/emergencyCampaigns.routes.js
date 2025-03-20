@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { EmergencyCampaign } = require('../models');
 
-
+// Create a campaign   
 router.post('/campaigns', async (req, res) => {
     try {
         const campaign = await EmergencyCampaign.create(req.body);
