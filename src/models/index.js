@@ -57,6 +57,15 @@ Request.belongsTo(Organization, { foreignKey: 'organization_id', as: 'requesting
 Organization.hasMany(Review, { foreignKey: 'organization_id', as: 'organizationReviews' });
 Review.belongsTo(Organization, { foreignKey: 'organization_id', as: 'reviewedOrganization' });
 
+// Organization ↔ User
+Organization.belongsTo(User, { foreignKey: 'user_id', as: 'organizationOwner' });
+User.hasMany(Organization, { foreignKey: 'user_id', as: 'ownedOrganizations' });
+
+// Organization ↔ Orphan
+Organization.hasMany(Orphan, { foreignKey: 'organization_id', as: 'organizationOrphans' });
+Orphan.belongsTo(Organization, { foreignKey: 'organization_id', as: 'orphanOrganization' });
+
+
 // (EmergencyCampaign)
 EmergencyCampaign.hasMany(Donation, { foreignKey: 'campaign_id', as: 'emergencyCampaignDonations' });
 Donation.belongsTo(EmergencyCampaign, { foreignKey: 'campaign_id', as: 'relatedEmergencyCampaign' });

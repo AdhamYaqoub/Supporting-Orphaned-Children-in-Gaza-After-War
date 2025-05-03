@@ -48,7 +48,7 @@ sequelize.authenticate()
     .catch(err => console.error('❌ Unable to connect to the database:', err));
 
 // **Sync models with the database** (preferably used only during development)
-sequelize.sync()
+sequelize.sync() // Set to true only during development to drop and recreate tables
     .then(() => console.log('🔄 Database synced'))
     .catch(err => console.error('⚠️ Error syncing database:', err));
 

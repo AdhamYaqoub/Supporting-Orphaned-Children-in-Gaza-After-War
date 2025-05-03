@@ -4,6 +4,7 @@ const sequelize = require('../config/database');
 
 const Organization = sequelize.define('Organization', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    user_id: { type: DataTypes.INTEGER, allowNull: false } ,// يشير إلى المستخدم المرتبط بالمنظمة
     name: DataTypes.STRING,
     address: DataTypes.STRING,
     contact_email: DataTypes.STRING,

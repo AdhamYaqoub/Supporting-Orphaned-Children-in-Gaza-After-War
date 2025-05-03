@@ -1,20 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const { Transaction } = require('../models');
+const uthorizeRoles = require('./../middleware/authMiddleware'); // استيراد الميدل وير الخاص بالتحقق من التوكن
 
-
-// Create a transactions
-router.post('/transactions', async (req, res) => {
-    try {
-        const transaction = await Transaction.create(req.body);
-        res.status(201).json(transaction);
-    } catch (err) {
-        res.status(400).json({ error: err.message });
-    }
-});
 
 // Get all transactions
-router.get('/transactions', async (req, res) => {
+router.get('/transactions', uthorizeRoles(['admin']),async (req, res) => {
     try {
         const transactions = await Transaction.findAll();
         res.json(transactions);
@@ -24,7 +15,7 @@ router.get('/transactions', async (req, res) => {
 });
 
 // Get a single transaction by ID
-router.get('/transactions/:transactionId', async (req, res) => {
+router.get('/transactions/:transactionId', uthorizeRoles(['admin']),  async (req, res) => {
     try {
         const transaction = await Transaction.findByPk(req.params.transactionId);
         if (!transaction) return res.status(404).json({ error: 'Transaction not found' });
@@ -35,10 +26,11 @@ router.get('/transactions/:transactionId', async (req, res) => {
 });
 
 // Update transaction status
-router.put('/transactions/:transactionId', async (req, res) => {
+router.put('/transactions/:transactionId',uthorizeRoles(['admin']), async (req, res) => {
     try {
         const transaction = await Transaction.findByPk(req.params.transactionId);
         if (!transaction) return res.status(404).json({ error: 'Transaction not found' });
+
         await transaction.update({ status: req.body.status });
         res.json(transaction);
     } catch (err) {
@@ -47,11 +39,15 @@ router.put('/transactions/:transactionId', async (req, res) => {
 });
 
 
-// Delete a donation
-router.delete('/transactions/:transactionId', async (req, res) => {
+// Delete a transaction
+router.delete('/transactions/:transactionId', uthorizeRoles(['donor']),async (req, res) => {
     try {
         const transaction = await Transaction.findByPk(req.params.transactionId);
         if (!transaction) return res.status(404).json({ error: 'transaction not found' });
+
+        if (transaction.user_id !== req.user.id) {
+            return res.status(403).json({ error: 'Access denied: Not your donation' });
+        }
         await transaction.destroy();
         res.status(204).send();
     } catch (err) {
