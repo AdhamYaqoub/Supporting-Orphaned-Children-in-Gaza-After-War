@@ -4,73 +4,78 @@ const { Donation , Transaction, EmergencyCampaign, sequelize } = require('../mod
 const uthorizeRoles = require('./../middleware/authMiddleware'); // استيراد الميدل وير الخاص بالتحقق من التوكن
 
 // Create a donation
+// إنشاء تبرع
 router.post('/donations', uthorizeRoles(['donor']), async (req, res) => {
-    try {
-      const { name, amount, category, organization_id, donation_item, quantity, campaign_id } = req.body;
-  
-      // التأكد من وجود المؤسسة أو الحملة إن تم تحديدها
-      if (!organization_id && !campaign_id) {
-        return res.status(400).json({ error: 'Please provide either organization_id or campaign_id' });
-      }
-      const updatedCampaign = await EmergencyCampaign.findByPk(campaign_id);
+  try {
+    const { name, amount, category, organization_id, donation_item, quantity, campaign_id } = req.body;
 
-        let donationData = {
-            user_id: req.user.id,
-            name,
-            amount,
-            category,
-            organization_id,
-            campaign_id,
-            donation_item,
-            quantity
-          };
-
-        if (campaign_id && updatedCampaign.status == 'completed') {
-          return res.status(400).json({ error: 'Please provide either organization_id or campaign_id' });
-        }
-        
-        const donation = await Donation.create(donationData);
-        
-    
-      // إذا كان التبرع يحتوي على مبلغ مالي
-      if (amount) {
-        const fee = parseFloat(amount) * 0.05;
-        const totalAmount = parseFloat(amount) - fee;
-  
-        let transactionType = 'donation';
-        if (campaign_id) transactionType = 'campaign';
-  
-        await Transaction.create({
-          user_id: req.user.id,
-          amount,
-          fee,
-          total_amount: totalAmount,
-          transaction_type: transactionType,
-          donation_id: donation.id
-        });
-  
-        // إذا كان التبرع لحملة طارئة
-        if (campaign_id) {
-          // تحديث المبلغ المتجمع باستخدام sequelize.literal
-          await EmergencyCampaign.update(
-            {
-              collected_amount: sequelize.literal(`collected_amount + ${totalAmount}`)
-            },
-            { where: { id: campaign_id } }
-          );
-  
-          // إعادة جلب الحملة للتأكد من حالة الجمع
-          if (parseFloat(updatedCampaign.collected_amount) >= parseFloat(updatedCampaign.target_amount)) {
-            await updatedCampaign.update({ status: 'completed' });
-          }
-        }
-      }
-  
-      res.status(201).json(donation);
-    } catch (err) {
-      res.status(400).json({ error: err.message });
+    // لازم يحدد يا منظمة يا حملة
+    if (!organization_id && !campaign_id) {
+      return res.status(400).json({ error: 'Please provide either organization_id or campaign_id' });
     }
-  });
+
+    // إذا كان التبرع لحملة
+    if (campaign_id) {
+      const campaign = await EmergencyCampaign.findByPk(campaign_id);
+      if (!campaign) {
+        return res.status(404).json({ error: 'Campaign not found.' });
+      }
+
+      if (campaign.status === 'completed') {
+        return res.status(400).json({ error: 'This campaign has already been completed and cannot receive more donations.' });
+      }
+    }
+
+    // إنشاء التبرع
+    const donation = await Donation.create({
+      user_id: req.user.id,
+      name,
+      amount,
+      category,
+      organization_id,
+      campaign_id,
+      donation_item,
+      quantity
+    });
+
+    // المعاملات المالية فقط
+    if (amount) {
+      const fee = parseFloat(amount) * 0.05;
+      const totalAmount = parseFloat(amount) - fee;
+
+      let transactionType = campaign_id ? 'campaign' : 'donation';
+
+      await Transaction.create({
+        user_id: req.user.id,
+        amount,
+        fee,
+        total_amount: totalAmount,
+        transaction_type: transactionType,
+        donation_id: donation.id
+      });
+
+      // تحديث حملة الطوارئ
+      if (campaign_id) {
+        await EmergencyCampaign.update(
+          {
+            collected_amount: sequelize.literal(`collected_amount + ${totalAmount}`)
+          },
+          { where: { id: campaign_id } }
+        );
+
+        const updatedCampaign = await EmergencyCampaign.findByPk(campaign_id);
+        if (parseFloat(updatedCampaign.collected_amount) >= parseFloat(updatedCampaign.target_amount)) {
+          await updatedCampaign.update({ status: 'completed' });
+        }
+      }
+    }
+
+    res.status(201).json(donation);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
   
   
 
