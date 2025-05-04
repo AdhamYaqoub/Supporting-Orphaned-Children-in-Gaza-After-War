@@ -65,6 +65,10 @@ User.hasMany(Organization, { foreignKey: 'user_id', as: 'ownedOrganizations' });
 Organization.hasMany(Orphan, { foreignKey: 'organization_id', as: 'organizationOrphans' });
 Orphan.belongsTo(Organization, { foreignKey: 'organization_id', as: 'orphanOrganization' });
 
+// Organization ↔ EmergencyCampaign
+Organization.hasMany(EmergencyCampaign, { foreignKey: 'organization_id', as: 'emergencyCampaigns' });
+EmergencyCampaign.belongsTo(Organization, { foreignKey: 'organization_id', as: 'campaignOrganization' });
+
 
 // (EmergencyCampaign)
 EmergencyCampaign.hasMany(Donation, { foreignKey: 'campaign_id', as: 'emergencyCampaignDonations' });
