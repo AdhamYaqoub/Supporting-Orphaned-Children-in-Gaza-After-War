@@ -9,6 +9,10 @@ const notificationsRoutes = require("./src/routes/notifications.routes"); // Imp
 const transactionsRoutes = require('./src/routes/transactions.routes'); // Import transactions routes
 const emergencyCampaigns = require('./src/routes/emergencyCampaigns.routes'); // Import emergencyCampaigns routes
 const addtionalFeatures = require('./src/routes/additionalFeatures.routes'); // Import additionalFeatures routes
+const volunteerRoutes=require('./src/routes/volunteer.routes');
+const organizationRoutes=require('./src/routes/organization.routes');
+const requestRoutes=require('./src/routes/request.routes');
+const matchingRoutes = require('./src/routes/match.routes');
 
 // create express app
 const app = express();
@@ -38,7 +42,10 @@ app.use('/api', emergencyCampaigns);
 app.use('/api', addtionalFeatures);
 
 
-
+app.use('/api/volunteers', volunteerRoutes);
+app.use('/api/organizations', organizationRoutes);
+app.use('/api/requests', requestRoutes);
+app.use('/api/matches', matchingRoutes);
 
 
 
@@ -48,7 +55,8 @@ sequelize.authenticate()
     .catch(err => console.error('❌ Unable to connect to the database:', err));
 
 // **Sync models with the database** (preferably used only during development)
-sequelize.sync() // Set to true only during development to drop and recreate tables
+sequelize.sync({alter:true}) // Set to true only during development to drop and recreate tables
+
     .then(() => console.log('🔄 Database synced'))
     .catch(err => console.error('⚠️ Error syncing database:', err));
 
