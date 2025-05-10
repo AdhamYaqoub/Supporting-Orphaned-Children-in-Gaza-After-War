@@ -56,7 +56,7 @@ sequelize.authenticate()
 
 // **Sync models with the database** (preferably used only during development)
 sequelize.sync({alter:true}) // Set to true only during development to drop and recreate tables
-
+//
     .then(() => console.log('🔄 Database synced'))
     .catch(err => console.error('⚠️ Error syncing database:', err));
 

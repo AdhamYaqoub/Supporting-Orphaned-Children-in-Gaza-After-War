@@ -1,21 +1,7 @@
 const Volunteer = require('../models/Volunteer');
 const Request = require('../models/Request');
 const Match = require('../models/Match');
-
-exports.createVolunteer = async (req, res) => {
-  const volunteer = await Volunteer.create(req.body);
-
-  const matchingRequests = await Request.findAll({
-    where: { service_needed: volunteer.service_type, status: 'pending' }
-  });
-
-  for (const request of matchingRequests) {
-    await Match.create({ volunteer_id: volunteer.id, request_id: request.id });
-  }
-
-  res.status(201).json(volunteer);
-};
-
+const Organization = require('../models/Organization');
 
 exports.getAllVolunteers = async (req, res) => {
   try {
@@ -53,5 +39,27 @@ exports.deleteVolunteer = async (req, res) => {
     res.status(200).json({ message: 'Volunteer deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Error deleting volunteer' });
+  }
+};
+
+exports.getVolunteersByOrphanageId = async (req, res) => {
+  try {
+    const { orphanageId } = req.params;
+
+    const organization = await Organization.findByPk(orphanageId, {
+      include: [{
+        model: Volunteer,
+        through: { attributes: [] }, // لإخفاء الجدول الوسيط
+      }]
+    });
+
+    if (!organization) {
+      return res.status(404).json({ message: 'Organization not found' });
+    }
+
+    return res.status(200).json(organization.Volunteers);
+  } catch (error) {
+    console.error('Error fetching volunteers:', error);
+    return res.status(500).json({ message: 'Server error' });
   }
 };

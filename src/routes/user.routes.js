@@ -4,7 +4,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const authMiddleware = require("../middleware/auth");
-
+const Volunteer =require("../models/Volunteer");
+const Organization=require("../models/Organization");
 require("dotenv").config();
 
 const router = express.Router();
@@ -12,15 +13,48 @@ let activeTokens = new Set(); // لتخزين التوكنات النشطة (ي�
 
 // ✅ تسجيل مستخدم جديد
 router.post("/register", async (req, res) => {
-    try {
-        const { name, email, password, role } = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10);
-        console.log(req.body.role); // ← طباعة كلمة المرور المشفرة
-        const newUser = await User.create({ name, email, password: hashedPassword, role });
-        res.status(201).json({ message: "User registered successfully", user: newUser });
-    } catch (error) {
-        res.status(500).json({ error: "Error registering user" });
+  try {
+    const { name, email, password, role,full_name,
+        phone_number, service_type, availability,address,contact_email } = req.body;
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role
+    });
+
+    // 👇 إذا كان المستخدم متطوع، أضف له سجل في جدول Volunteer
+    if (role === 'volunteer') {
+      await Volunteer.create({
+        user_id: newUser.id,
+         full_name,
+        phone_number,
+        service_type,
+        availability
+      });
     }
+    else if(role === 'orphanage') {
+      await Organization.create({
+        user_id: newUser.id,
+        name_orphanage:name,
+        address,
+        phone_number,
+        contact_email
+      });
+    }
+
+    res.status(201).json({
+      message: "User registered successfully",
+      user: newUser
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error registering user" });
+  }
 });
 // ✅ تسجيل الدخول
 router.post("/login", async (req, res) => {
