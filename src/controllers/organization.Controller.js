@@ -1,14 +1,5 @@
 const Organization = require('../models/Organization');
 
-exports.createOrganization = async (req, res) => {
-  try {
-    const organization = await Organization.create(req.body);
-    res.status(201).json(organization);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to create organization' });
-  }
-};
-
 exports.getAllOrganizations = async (req, res) => {
   try {
     const organizations = await Organization.findAll();
@@ -28,16 +19,45 @@ exports.getOrganizationById = async (req, res) => {
   }
 };
 
-exports.updateOrganization = async (req, res) => {
+exports.updateOrganization= async (req, res) => {
+  const { organizationId } = req.params;
+  const { name_orphanage, address, phone_number, contact_email, verified } = req.body;
+  
   try {
-    await Organization.update(req.body, {
-      where: { id: req.params.organizationId }
-    });
-    res.status(200).json({ message: 'Organization updated successfully' });
-  } catch (err) {
-    res.status(500).json({ error: 'Error updating organization' });
+    // تحقق من إذا كان المستخدم Admin
+    if (req.user.role === 'admin') {
+      // إذا كان Admin يمكنه تحديث verified
+      const updatedOrg = await Organization.update(
+        { name_orphanage, address, phone_number, contact_email, verified },
+        { where: { id: organizationId } }
+      );
+      return res.status(200).json({ message: 'Organization updated successfully', updatedOrg });
+    }
+
+    // إذا كان Orphanage فقط، يمكنه تحديث بياناته ولكن لا يستطيع تعديل verified
+    if (req.user.role === 'orphanage') {
+      // تحقق من أن الـ orphanage لا يمكنه تعديل بيانات منظمة أخرى
+      const organization = await Organization.findByPk(organizationId);
+
+      // تأكد من أن الـ user_id الخاص بالـ orphanage يتطابق مع الـ organizationId
+      if (organization.user_id !== req.user.id) {
+        return res.status(403).json({ message: 'You can only update your own organization' });
+      }
+
+      const updatedOrg = await Organization.update(
+        { name_orphanage, address, phone_number, contact_email },
+        { where: { id: organizationId, user_id: req.user.id } } // تأكد من أن الـ orphanage يمكنه تعديل بياناته فقط
+      );
+      return res.status(200).json({ message: 'Organization updated successfully', updatedOrg });
+    }
+
+    return res.status(403).json({ message: 'Unauthorized' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Server Error', error });
   }
 };
+
+
 
 exports.deleteOrganization = async (req, res) => {
   try {
