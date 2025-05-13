@@ -9,6 +9,7 @@ const EmergencyCampaign = require('./EmergencyCampaign');
 const Transaction = require('./Transaction');
 const Request = require('./Request');
 const Review = require('./Review');
+const OrganizationVolunteer = require('./OrganizationVolunteer');
 
 // (User)
 User.hasMany(Donation, { foreignKey: 'user_id', as: 'userDonations' });
@@ -30,8 +31,8 @@ Transaction.belongsTo(User, { foreignKey: 'user_id', as: 'transactionUser' });
 Orphan.hasMany(Sponsorship, { foreignKey: 'orphan_id', as: 'orphanSponsorships' });
 Sponsorship.belongsTo(Orphan, { foreignKey: 'orphan_id', as: 'sponsoredOrphan' });
 
-Orphan.hasMany(Request, { foreignKey: 'orphan_id', as: 'orphanRequests' });
-Request.belongsTo(Orphan, { foreignKey: 'orphan_id', as: 'requestingOrphan' });
+// Orphan.hasMany(Request, { foreignKey: 'orphan_id', as: 'orphanRequests' });
+// Request.belongsTo(Orphan, { foreignKey: 'orphan_id', as: 'requestingOrphan' });
 
 // (Donation)
 Donation.hasMany(Transaction, { foreignKey: 'donation_id', as: 'donationTransactions' });
@@ -57,9 +58,35 @@ Request.belongsTo(Organization, { foreignKey: 'organization_id', as: 'requesting
 Organization.hasMany(Review, { foreignKey: 'organization_id', as: 'organizationReviews' });
 Review.belongsTo(Organization, { foreignKey: 'organization_id', as: 'reviewedOrganization' });
 
+// Organization ↔ User
+Organization.belongsTo(User, { foreignKey: 'user_id', as: 'organizationOwner' });
+User.hasMany(Organization, { foreignKey: 'user_id', as: 'ownedOrganizations' });
+
+// Organization ↔ Orphan
+Organization.hasMany(Orphan, { foreignKey: 'organization_id', as: 'organizationOrphans' });
+Orphan.belongsTo(Organization, { foreignKey: 'organization_id', as: 'orphanOrganization' });
+
+// Organization ↔ EmergencyCampaign
+Organization.hasMany(EmergencyCampaign, { foreignKey: 'organization_id', as: 'emergencyCampaigns' });
+EmergencyCampaign.belongsTo(Organization, { foreignKey: 'organization_id', as: 'campaignOrganization' });
+
+
 // (EmergencyCampaign)
 EmergencyCampaign.hasMany(Donation, { foreignKey: 'campaign_id', as: 'emergencyCampaignDonations' });
 Donation.belongsTo(EmergencyCampaign, { foreignKey: 'campaign_id', as: 'relatedEmergencyCampaign' });
+
+// (OrganizationVolunteer)
+Volunteer.belongsToMany(Organization, {
+  through: OrganizationVolunteer,
+  foreignKey: 'volunteer_id',
+  otherKey: 'organization_id',
+});
+
+Organization.belongsToMany(Volunteer, {
+  through: OrganizationVolunteer,
+  foreignKey: 'organization_id',
+  otherKey: 'volunteer_id',
+});
 
 module.exports = {
   sequelize,
