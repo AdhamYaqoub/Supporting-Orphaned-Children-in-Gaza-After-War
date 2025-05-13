@@ -14,14 +14,22 @@ let activeTokens = new Set(); // لتخزين التوكنات النشطة (ي�
 router.post("/register", async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10);
 
+        if (!name || !email || !password || !role) {
+            return res.status(400).json({ error: "All fields (name, email, password, role) are required" });
+        }
+             console.log("Registering user:", { name, email, password, role }); // ✅ طباعة البيانات المدخلة في السيرفر
+        const hashedPassword = await bcrypt.hash(password, 10);
+        console.log("Hashed password:", hashedPassword); // ✅ طباعة كلمة المرور المشفرة في السيرفر
         const newUser = await User.create({ name, email, password: hashedPassword, role });
+
         res.status(201).json({ message: "User registered successfully", user: newUser });
     } catch (error) {
-        res.status(500).json({ error: "Error registering user" });
+        console.error("Register error:", error);
+        res.status(500).json({ error: error.message });
     }
 });
+
 
 // ✅ تسجيل الدخول
 router.post("/login", async (req, res) => {

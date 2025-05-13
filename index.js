@@ -12,6 +12,7 @@ app.use("/api/users", usersRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/notifications", notificationsRoutes);
+app.use(express.urlencoded({ extended: true }));
 
 // الاستماع على المنفذ
 // const PORT = process.env.PORT || 5000;
@@ -19,7 +20,7 @@ app.use("/api/notifications", notificationsRoutes);
 //     console.log(`Server is running on port ${PORT}`);
 // });
 
-const express = require('express');
+// const express = require('express');
 const bodyParser = require('body-parser');
 const sequelize = require('./src/config/database'); // Import database settings
 const donationRoutes = require('./src/routes/donation.routes'); // Import donation routes
@@ -50,7 +51,7 @@ sequelize.authenticate()
     .catch(err => console.error('❌ Unable to connect to the database:', err));
 
 // **Sync models with the database** (preferably used only during development)
-sequelize.sync()
+sequelize.sync({alter: true}) // Use { force: true } to drop and recreate tables
     .then(() => console.log('🔄 Database synced'))
     .catch(err => console.error('⚠️ Error syncing database:', err));
 

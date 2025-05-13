@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-
 const User = sequelize.define('User', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, allowNull: false },
@@ -8,12 +7,14 @@ const User = sequelize.define('User', {
     password: { type: DataTypes.STRING, allowNull: false },
     role: { type: DataTypes.ENUM('donor', 'volunteer', 'admin'), allowNull: false },
     created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+
+    // 🛠️ أضف هذه الحقول الجديدة:
+    resetToken: { type: DataTypes.STRING, allowNull: true },
+    resetTokenExpiration: { type: DataTypes.DATE, allowNull: true }
   },
   {
-    tableName: "users", // ✅ تحديد اسم الجدول لمنع تحويله إلى "Users"
-    timestamps: false,  // ✅ منع Sequelize من إضافة createdAt و updatedAt
-    underscored: true   // ✅ التأكد من استخدام snake_case
+    tableName: "users",
+    timestamps: false,
+    underscored: true
   }
 );
-
-module.exports = User;
