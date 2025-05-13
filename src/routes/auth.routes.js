@@ -5,6 +5,7 @@ const User = require("../models/User");
 const nodemailer = require("nodemailer"); // لإرسال البريد الإلكتروني
 const crypto = require("crypto"); // لتوليد رمز إعادة تعيين كلمة السر
 const authMiddleware = require("../middleware/auth");
+const { Op } = require("sequelize"); // هذا مهم لاستخدام Op.gt
 
 require("dotenv").config();
 
@@ -62,7 +63,7 @@ router.post("/forgot-password", async (req, res) => {
             to: email,
             subject: "Password Reset",
             text: `You requested a password reset. Please click the link below to reset your password:
-            http://localhost:5000/api/reset-password/${resetToken}`,
+            http://localhost:5000/api/auth/reset-password/${resetToken}`,
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
@@ -71,9 +72,11 @@ router.post("/forgot-password", async (req, res) => {
             }
             res.json({ message: "Password reset link sent to email" });
         });
-    } catch (error) {
-        res.status(500).json({ error: "Error processing password reset request" });
-    }
+    }catch (error) {
+    console.log("خطأ أثناء إعادة تعيين كلمة المرور:", error); // اطبع الخطأ
+    res.status(500).json({ error: "Error resetting password" });
+}
+
 });
 
 // 🚀 إعادة تعيين كلمة المرور
@@ -98,6 +101,23 @@ router.post("/reset-password/:resetToken", async (req, res) => {
         res.status(500).json({ error: "Error resetting password" });
     }
 });
+
+router.get("/reset-password/:resetToken", async (req, res) => {
+    const { resetToken } = req.params;
+    res.send(`
+        <html>
+        <head><title>Reset Password</title></head>
+        <body>
+            <h2>Reset Your Password</h2>
+            <form method="POST" action="/api/auth/reset-password/${resetToken}">
+                <input type="password" name="password" placeholder="New Password" required />
+                <button type="submit">Reset Password</button>
+            </form>
+        </body>
+        </html>
+    `);
+});
+
 
 module.exports = router;
 
