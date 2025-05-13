@@ -1,15 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const { EmergencyCampaign, Organization } = require('../models');
+const { EmergencyCampaign, Organization, User } = require('../models');
 const uthorizeRoles = require('./../middleware/authMiddleware'); 
+const nodemailer = require("nodemailer"); // تأكد أنك مستدعيه فوق
+
 
 // Create a campaign   
-router.post('/campaigns',  uthorizeRoles(['orphanage']), async (req, res) => {
+router.post('/campaigns', uthorizeRoles(['orphanage']), async (req, res) => {
   try {
     const { title, description, target_amount } = req.body;
 
     // 🟢 اجلب المنظمة الخاصة بالمستخدم الحالي
     const organization = await Organization.findOne({ where: { user_id: req.user.id } });
+    const user = await User.findOne({ where: { id: req.user.id } });
 
     if (!organization) {
       return res.status(404).json({ error: 'Organization not found for this user.' });
@@ -21,11 +24,55 @@ router.post('/campaigns',  uthorizeRoles(['orphanage']), async (req, res) => {
       title,
       description,
       target_amount,
-      organization_id: organization.id, // استخدم id الخاص بالمنظمة
+      organization_id: organization.id,
     });
+
+    // 🟡 جلب جميع المتبرعين
+    const donors = await User.findAll({ where: { role: 'donor' } });
+
+    // 🔵 إعداد إعدادات الإيميل
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+
+    // 🔴 إرسال الإيميل لكل متبرع
+    for (let donor of donors) {
+      const mailOptions = {
+        from: process.env.EMAIL,
+        to: donor.email,
+        subject: "🚨 New emergency campaign!",
+      text: `Dear ${donor.name},
+
+We hope this message finds you well.
+
+A new **Emergency Campaign** has just been launched by the orphanage **${user.name}**.
+
+📌 **Campaign Title:** ${title}
+📝 **Description:** ${description}
+🎯 **Target Amount:** $${target_amount}
+
+Your support can make a big difference.
+
+Please consider donating and sharing this campaign with others who might help.
+
+Thank you for your continued generosity!
+
+Best regards,  
+Supporting Orphaned Children Team`
+,
+      };
+
+      // ممكن تستخدم sendMail مع await أو callback
+      await transporter.sendMail(mailOptions);
+    }
 
     res.status(201).json(campaign);
   } catch (err) {
+    console.error("خطأ أثناء إنشاء الحملة أو إرسال الإيميلات:", err);
     res.status(400).json({ error: err.message });
   }
 });

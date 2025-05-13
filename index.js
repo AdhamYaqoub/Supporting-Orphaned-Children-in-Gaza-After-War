@@ -33,11 +33,6 @@ app.use(express.urlencoded({ extended: true }));
 // });
 
 // const express = require('express');
-const bodyParser = require('body-parser');
-const sequelize = require('./src/config/database'); // Import database settings
-const donationRoutes = require('./src/routes/donation.routes'); // Import donation routes
-const transactionsRoutes = require('./src/routes/transactions.routes'); // Import transactions routes
-const emergencyCampaigns = require('./src/routes/emergencyCampaigns.routes'); // Import emergencyCampaigns routes
 
 
 // **Import models to define them with the database**

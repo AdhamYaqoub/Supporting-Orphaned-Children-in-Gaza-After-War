@@ -74,7 +74,9 @@ router.post("/register", async (req, res) => {
     console.error(error);
     res.status(500).json({ error: "Error registering user" });
   }
+}
 });
+
 
 // ✅ تسجيل الدخول
 router.post("/login", async (req, res) => {
