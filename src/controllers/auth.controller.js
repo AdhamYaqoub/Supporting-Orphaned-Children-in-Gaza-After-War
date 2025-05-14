@@ -1,72 +1,110 @@
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const { ObjectId } = require('mongodb');
-const nodemailer = require('nodemailer');
-const connectDB = require('../config/database'); // Assuming you have a connectDB function to connect to your MongoDB
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
+const { Op } = require("sequelize");
+const User = require("../models/User");
 
-// ⛔ Forgot Password
-const forgotPassword = async (req, res) => {
-  const { email } = req.body;
+let activeTokens = new Set(); 
 
-  try {
-    const db = await connectDB();
-    const users = db.collection('users');
+exports.refreshToken = async (req, res) => {
+    try {
+        const refreshToken = req.body.refreshToken;
+        if (!refreshToken || !activeTokens.has(refreshToken)) {
+            return res.status(403).json({ error: "Forbidden: Invalid refresh token" });
+        }
 
-    const user = await users.findOne({ email });
-    if (!user) return res.status(400).json({ message: 'Email not found' });
-
-    const resetToken = jwt.sign({ userId: user._id }, process.env.RESET_SECRET, { expiresIn: '15m' });
-    const resetLink = `http://localhost:5000/api/auth/reset-password?token=${resetToken}`;
-
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
-
-    await transporter.sendMail({
-      from: process.env.EMAIL,
-      to: email,
-      subject: 'Reset Your Password',
-      text: `Click the link to reset your password:\n${resetLink}`,
-    });
-
-    res.status(200).json({ message: 'Reset link sent to email.' });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Failed to send reset email.' });
-  }
+        const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+        const newToken = jwt.sign(
+            { id: decoded.id, email: decoded.email, role: decoded.role },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
+        );
+        res.json({ token: newToken });
+    } catch (error) {
+        res.status(500).json({ error: "Error refreshing token" });
+    }
 };
 
-// ✅ Reset Password
-const resetPassword = async (req, res) => {
-  const { token, newPassword } = req.body;
+exports.forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ where: { email } });
+        if (!user) return res.status(404).json({ error: "User not found" });
 
-  if (!token || !newPassword)
-    return res.status(400).json({ message: 'Missing token or password.' });
+        const resetToken = crypto.randomBytes(20).toString("hex");
+        const resetTokenExpiration = Date.now() + 3600000;
 
-  try {
-    const decoded = jwt.verify(token, process.env.RESET_SECRET);
+        user.resetToken = resetToken;
+        user.resetTokenExpiration = resetTokenExpiration;
+        await user.save();
 
-    const db = await connectDB();
-    const users = db.collection('users');
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.EMAIL,
+                pass: process.env.EMAIL_PASSWORD,
+            },
+        });
 
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await users.updateOne(
-      { _id: new ObjectId(decoded.userId) },
-      { $set: { password: hashedPassword } }
-    );
+        const mailOptions = {
+            from: process.env.EMAIL,
+            to: email,
+            subject: "Password Reset",
+            text: `You requested a password reset. Please click the link below to reset your password:
+            http://localhost:5000/api/auth/reset-password/${resetToken}`,
+        };
 
-    res.json({ message: 'Password has been reset successfully.' });
-
-  }catch (err) {
-  console.error("Error in forgotPassword:", err);  // 🔍 أضف هذا السطر
-  res.status(500).json({ message: 'Failed to send reset email.' });
-}
-
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) return res.status(500).json({ error: "Error sending email" });
+            res.json({ message: "Password reset link sent to email" });
+        });
+    } catch (error) {
+        console.error("خطأ أثناء إعادة تعيين كلمة المرور:", error);
+        res.status(500).json({ error: "Error resetting password" });
+    }
 };
 
-module.exports = { forgotPassword, resetPassword };
+exports.resetPasswordForm = (req, res) => {
+    const { resetToken } = req.params;
+    res.send(`
+        <html>
+        <head><title>Reset Password</title></head>
+        <body>
+            <h2>Reset Your Password</h2>
+            <form method="POST" action="/api/auth/reset-password/${resetToken}">
+                <input type="password" name="password" placeholder="New Password" required />
+                <button type="submit">Reset Password</button>
+            </form>
+        </body>
+        </html>
+    `);
+};
+
+exports.resetPassword = async (req, res) => {
+    try {
+        const { resetToken } = req.params;
+        const { password } = req.body;
+
+        const user = await User.findOne({
+            where: {
+                resetToken,
+                resetTokenExpiration: { [Op.gt]: Date.now() },
+            },
+        });
+
+        if (!user) return res.status(404).json({ error: "Invalid or expired reset token" });
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        user.password = hashedPassword;
+        user.resetToken = null;
+        user.resetTokenExpiration = null;
+        await user.save();
+
+        res.json({ message: "Password reset successfully" });
+    } catch (error) {
+        res.status(500).json({ error: "Error resetting password" });
+    }
+};
+
+exports.activeTokens = activeTokens;
