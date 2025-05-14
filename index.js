@@ -13,6 +13,9 @@ const volunteerRoutes=require('./src/routes/volunteer.routes');
 const organizationRoutes=require('./src/routes/organization.routes');
 const requestRoutes=require('./src/routes/request.routes');
 const matchingRoutes = require('./src/routes/match.routes');
+const orphanRoutes = require('./routes/orphanRoutes');
+const sponsorshipRoutes = require('./routes/sponsorshipRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
 
 // create express app
 const app = express();
@@ -33,11 +36,6 @@ app.use(express.urlencoded({ extended: true }));
 // });
 
 // const express = require('express');
-const bodyParser = require('body-parser');
-const sequelize = require('./src/config/database'); // Import database settings
-const donationRoutes = require('./src/routes/donation.routes'); // Import donation routes
-const transactionsRoutes = require('./src/routes/transactions.routes'); // Import transactions routes
-const emergencyCampaigns = require('./src/routes/emergencyCampaigns.routes'); // Import emergencyCampaigns routes
 
 
 // **Import models to define them with the database**
@@ -64,7 +62,9 @@ app.use('/api/organizations', organizationRoutes);
 app.use('/api/requests', requestRoutes);
 app.use('/api/matches', matchingRoutes);
 
-
+app.use('/api/orphans', orphanRoutes);
+app.use('/api/sponsorships', sponsorshipRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // **Test database connection**
 sequelize.authenticate()
