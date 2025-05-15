@@ -8,7 +8,6 @@ const User = sequelize.define('User', {
     role: { type: DataTypes.ENUM('donor', 'volunteer', 'admin','orphanage'), allowNull: false },
     created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
 
-    // 🛠️ أضف هذه الحقول الجديدة:
     resetToken: { type: DataTypes.STRING, allowNull: true },
     resetTokenExpiration: { type: DataTypes.DATE, allowNull: true }
   },
@@ -19,4 +18,5 @@ const User = sequelize.define('User', {
   }
 );
 module.exports = User;
+
 
