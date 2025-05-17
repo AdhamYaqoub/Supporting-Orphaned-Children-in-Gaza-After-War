@@ -16,6 +16,7 @@ const orphanRoutes = require("./src/routes/orphan.routes");
 const sponsorshipRoutes = require("./src/routes/sponsorship.routes");
 const reviewRoutes = require("./src/routes/review.routes");
 const VolunteerApplicationRoutes = require("./src/routes/volunteerApplication.routes");
+const orphanUpdateRoutes = require("./src/routes/orphanUpdate.routes");
 
 // create express app
 const app = express();
@@ -51,6 +52,7 @@ app.use("/api/VolunteerApplication", VolunteerApplicationRoutes);
 app.use("/api/orphans", orphanRoutes);
 app.use("/api/sponsorships", sponsorshipRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/orphan-updates", orphanUpdateRoutes);
 
 // **Test database connection**
 sequelize

@@ -11,7 +11,7 @@ const {
 } = require("../controllers/orphan.controller");
 
 router.post("/", uthorizeRoles(["admin", "orphanage"]), createOrphan);
-router.get("/", uthorizeRoles(["admin", "orphanage"]), getOrphans);
+router.get("/", uthorizeRoles(["admin", "orphanage", "donor"]), getOrphans);
 router.get(
   "/:orphanId",
   uthorizeRoles(["admin", "orphanage", "donor"]),

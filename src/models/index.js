@@ -11,7 +11,7 @@ const Request = require("./Request");
 const Review = require("./Review");
 const OrganizationVolunteer = require("./OrganizationVolunteer");
 const VolunteerApplication = require("./VolunteerApplication");
-
+const OrphanUpdate = require("./OrphanUpdate");
 // (User)
 User.hasMany(Donation, { foreignKey: "user_id", as: "userDonations" });
 Donation.belongsTo(User, { foreignKey: "user_id", as: "donorUser" });
@@ -171,6 +171,10 @@ Volunteer.hasMany(VolunteerApplication, {
   as: "applications",
 });
 
+// ربط orphan مع التحديثات
+Orphan.hasMany(OrphanUpdate, { foreignKey: "orphan_id", as: "updates" });
+OrphanUpdate.belongsTo(Orphan, { foreignKey: "orphan_id", as: "orphan" });
+
 module.exports = {
   sequelize,
   User,
@@ -184,4 +188,5 @@ module.exports = {
   Request,
   Review,
   VolunteerApplication,
+  OrphanUpdate,
 };

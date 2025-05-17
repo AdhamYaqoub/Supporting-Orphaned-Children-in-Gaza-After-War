@@ -1,4 +1,4 @@
-const { Sponsorship } = require("../models");
+const Sponsorship = require("../models/Sponsorship");
 
 exports.createSponsorship = async (req, res) => {
   try {
@@ -8,19 +8,27 @@ exports.createSponsorship = async (req, res) => {
         .json({ error: "Unauthorized. User not authenticated." });
     }
 
-    const { orphan_id, monthly_amount, start_date, end_date } = req.body;
+    const {
+      orphan_id,
+      sponsorship_type = "financial",
+      amount,
+      start_date,
+      end_date,
+      payment_frequency = "monthly",
+    } = req.body;
 
-    // تحقق من البيانات المطلوبة
-    if (!orphan_id) {
+    if (!orphan_id || !amount || !start_date || !end_date) {
       return res.status(400).json({ error: "Missing required fields." });
     }
 
     const sponsorship = await Sponsorship.create({
       donor_id: req.user.id,
       orphan_id,
-      monthly_amount,
+      sponsorship_type,
+      amount,
       start_date,
       end_date,
+      payment_frequency,
     });
 
     res.status(201).json(sponsorship);
@@ -45,9 +53,11 @@ exports.getSponsorshipById = async (req, res) => {
     const sponsorship = await Sponsorship.findByPk(req.params.sponsorshipId);
     if (!sponsorship)
       return res.status(404).json({ error: "Sponsorship not found" });
+
     if (req.user.role === "donor" && sponsorship.donor_id !== req.user.id) {
       return res.status(403).json({ error: "Unauthorized" });
     }
+
     res.json(sponsorship);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -59,9 +69,11 @@ exports.updateSponsorship = async (req, res) => {
     const sponsorship = await Sponsorship.findByPk(req.params.sponsorshipId);
     if (!sponsorship)
       return res.status(404).json({ error: "Sponsorship not found" });
+
     if (req.user.role === "donor" && sponsorship.donor_id !== req.user.id) {
       return res.status(403).json({ error: "Unauthorized" });
     }
+
     await sponsorship.update(req.body);
     res.json(sponsorship);
   } catch (err) {
@@ -74,9 +86,11 @@ exports.deleteSponsorship = async (req, res) => {
     const sponsorship = await Sponsorship.findByPk(req.params.sponsorshipId);
     if (!sponsorship)
       return res.status(404).json({ error: "Sponsorship not found" });
+
     if (req.user.role === "donor" && sponsorship.donor_id !== req.user.id) {
       return res.status(403).json({ error: "Unauthorized" });
     }
+
     await sponsorship.destroy();
     res.json({ message: "Sponsorship deleted successfully" });
   } catch (err) {
