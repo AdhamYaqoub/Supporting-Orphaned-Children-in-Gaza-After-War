@@ -1,16 +1,35 @@
 const { User, Donation } = require("../models");
+const { Op } = require("sequelize");
 
 exports.getStats = async (req, res) => {
   try {
-    const userCount = await User.count();
-    const donationCount = await Donation.count();
-    const activityCount = 0; 
+    const userId = req.user.id;
+
+    // عدد التبرعات الكلي للمتبرع
+    const donationCount = await Donation.count({
+      where: { user_id:userId },
+    });
+
+    // مجموع التبرعات للمتبرع حسب الفئة
+    const donationsByCategory = await Donation.findAll({
+      where: { user_id:userId },
+      attributes: [
+        "category",
+        [Donation.sequelize.fn("SUM", Donation.sequelize.col("amount")), "totalAmount"],
+      ],
+      group: ["category"],
+    });
+
+    // صياغة النتائج بشكل أبسط
+    const categorySummary = {};
+    donationsByCategory.forEach((entry) => {
+      categorySummary[entry.category] = parseFloat(entry.dataValues.totalAmount);
+    });
 
     res.json({
       stats: {
-        userCount,
         donationCount,
-        activityCount,
+        donationsByCategory: categorySummary,
       },
     });
   } catch (error) {
@@ -19,12 +38,16 @@ exports.getStats = async (req, res) => {
   }
 };
 
-
 exports.getLogs = async (req, res) => {
   try {
+    const userId = req.user.id;
+
+    // آخر 10 تبرعات للمتبرع مع تفاصيل أكثر
     const logs = await Donation.findAll({
+      where: { user_id:userId },
       order: [["created_at", "DESC"]],
       limit: 10,
+      attributes: ["id", "category", "amount", "created_at"],
     });
 
     res.json({ logs });
