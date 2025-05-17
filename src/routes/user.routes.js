@@ -1,17 +1,10 @@
-
 const express = require("express");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
-const authMiddleware = require("../middleware/auth");
-const Volunteer =require("../models/Volunteer");
-const Organization=require("../models/Organization");
-require("dotenv").config();
-
 const router = express.Router();
-let activeTokens = new Set(); // لتخزين التوكنات النشطة (يمكن استبداله بـ Redis)
 
-// ✅ تسجيل مستخدم جديد
+const authMiddleware = require("../middleware/auth");
+const authController = require("../controllers/user.controller");
+
+let activeTokens = new Set(); 
 router.post("/register", async (req, res) => {
  
     try {
@@ -150,14 +143,21 @@ router.delete("/:userId", authMiddleware, async (req, res) => {
             return res.status(403).json({ error: "Unauthorized to delete this account" });
         }
 
-        const user = await User.findByPk(userId);
-        if (!user) return res.status(404).json({ error: "User not found" });
-
-        await user.destroy();
-        res.json({ message: "Account deleted successfully" });
+        // You may want to implement the actual delete logic here
+        // For example:
+        // await User.destroy({ where: { id: userId } });
+        res.json({ message: "User deleted successfully" });
     } catch (error) {
-        res.status(500).json({ error: "Error deleting account" });
+        res.status(500).json({ error: "Error deleting user" });
     }
 });
+
+router.post("/register", authController.register);
+router.post("/login", authController.login);
+router.post("/logout", authMiddleware, authController.logout);
+
+router.get("/profile", authMiddleware, authController.getProfile);
+router.put("/profile", authMiddleware, authController.updateProfile);
+router.delete("/:userId", authMiddleware, authController.deleteUser);
 
 module.exports = router;

@@ -1,78 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const { Orphan, Organization } = require('../models');
 const authMiddleware = require('../middleware/authMiddleware');
-const authorizeRoles = require('../middleware/authMiddleware').authorizeRoles;
+const uthorizeRoles = require('./../middleware/authMiddleware'); 
+const {
+    createOrphan,
+    getOrphans,
+    getOrphanById,
+    updateOrphan,
+    deleteOrphan
+} = require('../controllers/orphan.controller');
 
-router.post('/', authMiddleware, authorizeRoles(['admin', 'orphanage']), async (req, res) => {
-    try {
-        let organizationId;
-        if (req.user.role === 'orphanage') {
-            const org = await Organization.findOne({ where: { user_id: req.user.id } });
-            if (!org) return res.status(403).json({ error: 'Organization not found' });
-            organizationId = org.id;
-        } else {
-            organizationId = req.body.organization_id;
-        }
-
-        const orphan = await Orphan.create({ ...req.body, organization_id: organizationId });
-        res.status(201).json(orphan);
-    } catch (err) {
-        res.status(400).json({ error: err.message });
-    }
-});
-
-router.get('/', authMiddleware, async (req, res) => {
-    try {
-        const orphans = await Orphan.findAll();
-        res.json(orphans);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-router.get('/:orphanId', authMiddleware, async (req, res) => {
-    try {
-        const orphan = await Orphan.findByPk(req.params.orphanId);
-        if (!orphan) return res.status(404).json({ error: 'Orphan not found' });
-        res.json(orphan);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-router.put('/:orphanId', authMiddleware, authorizeRoles(['admin', 'orphanage']), async (req, res) => {
-    try {
-        const orphan = await Orphan.findByPk(req.params.orphanId);
-        if (!orphan) return res.status(404).json({ error: 'Orphan not found' });
-
-        if (req.user.role === 'orphanage') {
-            const org = await Organization.findOne({ where: { user_id: req.user.id } });
-            if (orphan.organization_id !== org.id) return res.status(403).json({ error: 'Unauthorized' });
-        }
-
-        await orphan.update(req.body);
-        res.json(orphan);
-    } catch (err) {
-        res.status(400).json({ error: err.message });
-    }
-});
-
-router.delete('/:orphanId', authMiddleware, authorizeRoles(['admin', 'orphanage']), async (req, res) => {
-    try {
-        const orphan = await Orphan.findByPk(req.params.orphanId);
-        if (!orphan) return res.status(404).json({ error: 'Orphan not found' });
-
-        if (req.user.role === 'orphanage') {
-            const org = await Organization.findOne({ where: { user_id: req.user.id } });
-            if (orphan.organization_id !== org.id) return res.status(403).json({ error: 'Unauthorized' });
-        }
-
-        await orphan.destroy();
-        res.status(204).send();
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
+router.post('/', authMiddleware, uthorizeRoles(['admin', 'orphanage']), createOrphan);
+router.get('/', authMiddleware, getOrphans);
+router.get('/:orphanId', authMiddleware, getOrphanById);
+router.put('/:orphanId', authMiddleware, uthorizeRoles(['admin', 'orphanage']), updateOrphan);
+router.delete('/:orphanId', authMiddleware, uthorizeRoles(['admin', 'orphanage']), deleteOrphan);
 
 module.exports = router;
