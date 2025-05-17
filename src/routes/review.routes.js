@@ -12,7 +12,7 @@ const {
 router.post('/', uthorizeRoles(['donor', 'volunteer']), createReview);
 router.get('/', getReviews);
 router.get('/:reviewId', getReviewById);
-router.put('/:reviewId', updateReview);
-router.delete('/:reviewId', deleteReview);
+router.put('/:reviewId',uthorizeRoles(['donor', 'volunteer']), updateReview);
+router.delete('/:reviewId',uthorizeRoles(['donor', 'volunteer']), deleteReview);
 
 module.exports = router;

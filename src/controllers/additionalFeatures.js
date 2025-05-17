@@ -1,6 +1,6 @@
 const { EmergencyCampaign, Donation, Organization } = require("../models");
 const { Op } = require("sequelize");
-const { exportToCSV, exportToPDF } = require("../utils/exporter");
+const { exportToExcel, exportToPDF } = require("../utils/exporter");
 
 // Search donations and campaigns
 exports.searchData = async (req, res) => {
@@ -39,8 +39,8 @@ exports.searchData = async (req, res) => {
   }
 };
 
-// Export donations as CSV
-exports.exportCSV = async (req, res) => {
+// Export donations as XLSX
+exports.exportExcel = async (req, res) => {
   try {
     let donations;
 
@@ -52,31 +52,34 @@ exports.exportCSV = async (req, res) => {
 
       const organizationId = organization.id;
 
-      // Get campaigns belonging to this orphanage
-      const campaigns = await EmergencyCampaign.findAll({ 
-        where: { organization_id: organizationId }, 
-        attributes: ['id'] 
+      const campaigns = await EmergencyCampaign.findAll({
+        where: { organization_id: organizationId },
+        attributes: ['id']
       });
 
       const campaignIds = campaigns.map(c => c.id);
 
-      // Get both direct and campaign-related donations
-      donations = await Donation.findAll({ 
+      donations = await Donation.findAll({
         where: {
           [Op.or]: [
             { organization_id: organizationId },
-            { campaign_id: campaignIds.length > 0 ? { [Op.in]: campaignIds } : null }
+            ...(campaignIds.length > 0 ? [{ campaign_id: { [Op.in]: campaignIds } }] : [])
           ]
         }
       });
     }
 
-    const csvData = await exportToCSV(donations);
-    res.attachment("donations.csv").send(csvData);
+    const excelBuffer = await exportToExcel(donations);
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=test.xlsx');
+    res.send(excelBuffer);
   } catch (err) {
+    console.error("Export error:", err);
     res.status(500).json({ error: err.message });
   }
 };
+
 
 // Export donations as PDF
 exports.exportPDF = async (req, res) => {
@@ -100,15 +103,16 @@ exports.exportPDF = async (req, res) => {
       const campaignIds = campaigns.map(c => c.id);
 
       // Get both direct and campaign-related donations
-      donations = await Donation.findAll({ 
-        where: {
-          [Op.or]: [
-            { organization_id: organizationId },
-            { campaign_id: campaignIds.length > 0 ? { [Op.in]: campaignIds } : null }
-          ]
-        }
-        
-      });
+      donations = await Donation.findAll({
+  where: {
+    [Op.or]: [
+      { organization_id: organizationId },
+      ...(campaignIds.length > 0 ? [{ campaign_id: { [Op.in]: campaignIds } }] : [])
+    ]
+  },
+  attributes: ["id", "category", "amount", "created_at"]
+});
+
     }
 
 
