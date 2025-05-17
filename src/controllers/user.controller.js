@@ -4,8 +4,9 @@ const { Op } = require("sequelize");
 const User = require("../models/User");
 const Volunteer = require("../models/Volunteer");
 const Organization = require("../models/Organization");
+// const sponsor = require("../models/Sponsor");
 
-let activeTokens = new Set(); 
+let activeTokens = new Set();
 
 exports.register = async (req, res) => {
   try {
@@ -25,7 +26,9 @@ exports.register = async (req, res) => {
     if (!name || !email || !password || !role) {
       return res
         .status(400)
-        .json({ error: "All fields (name, email, password, role) are required" });
+        .json({
+          error: "All fields (name, email, password, role) are required",
+        });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
