@@ -1,4 +1,5 @@
-const { Donation, Transaction, EmergencyCampaign, sequelize } = require('../models');
+const { Donation, Transaction, EmergencyCampaign, sequelize, User } = require('../models');
+const nodemailer = require("nodemailer");
 
 exports.createDonation = async (req, res) => {
   try {
@@ -55,10 +56,40 @@ exports.createDonation = async (req, res) => {
           await updatedCampaign.update({ status: 'completed' });
         }
       }
+
+      // 💌 إرسال الإيميل للمتبرع
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.EMAIL,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      });
+      const user = await User.findOne({ where: { id: req.user.id } });
+
+
+      const mailOptions = {
+  from: process.env.EMAIL,
+  to: req.user.email,
+  subject: "✅ Donation Confirmation",
+  text: `Dear ${user.name},
+
+Thank you for your generous donation.
+
+We are pleased to inform you that a donation of $${amount} has been successfully processed from your account in support of the cause${campaign_id ? ' in the emergency campaign' : ''}.
+
+Your contribution is truly appreciated and will go a long way in helping those in need.
+
+Best regards,  
+Supporting Orphaned Children Team`
+};
+
+      await transporter.sendMail(mailOptions);
     }
 
     res.status(201).json(donation);
   } catch (err) {
+    console.error("Error creating donation or sending email:", err);
     res.status(400).json({ error: err.message });
   }
 };
