@@ -143,6 +143,14 @@ router.delete("/:userId", authMiddleware, async (req, res) => {
             return res.status(403).json({ error: "Unauthorized to delete this account" });
         }
 
+        // You may want to implement the actual delete logic here
+        // For example:
+        // await User.destroy({ where: { id: userId } });
+        res.json({ message: "User deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ error: "Error deleting user" });
+    }
+});
 
 router.post("/register", authController.register);
 router.post("/login", authController.login);

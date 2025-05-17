@@ -51,4 +51,11 @@ exports.deleteSponsorship = async (req, res) => {
         const sponsorship = await Sponsorship.findByPk(req.params.sponsorshipId);
         if (!sponsorship) return res.status(404).json({ error: 'Sponsorship not found' });
         if (req.user.role === 'donor' && sponsorship.donor_id !== req.user.id) {
-            return res.status(403).json({ error: 'Unauthorized'
+            return res.status(403).json({ error: 'Unauthorized' });
+        }
+        await sponsorship.destroy();
+        res.json({ message: 'Sponsorship deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};

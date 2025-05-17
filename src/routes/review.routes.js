@@ -1,19 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const authMiddleware = require('../middleware/authMiddleware');
-const authorizeRoles = require('../middleware/authMiddleware').authorizeRoles;
+const uthorizeRoles = require('./../middleware/authMiddleware'); 
 const {
     createReview,
     getReviews,
     getReviewById,
     updateReview,
     deleteReview
-} = require('../controllers/reviewController');
+} = require('../controllers/reviews.controller');
 
-router.post('/', authMiddleware, authorizeRoles(['donor', 'volunteer']), createReview);
-router.get('/', authMiddleware, getReviews);
-router.get('/:reviewId', authMiddleware, getReviewById);
-router.put('/:reviewId', authMiddleware, updateReview);
-router.delete('/:reviewId', authMiddleware, deleteReview);
+router.post('/', uthorizeRoles(['donor', 'volunteer']), createReview);
+router.get('/', getReviews);
+router.get('/:reviewId', getReviewById);
+router.put('/:reviewId', updateReview);
+router.delete('/:reviewId', deleteReview);
 
 module.exports = router;

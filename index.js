@@ -13,9 +13,9 @@ const volunteerRoutes=require('./src/routes/volunteer.routes');
 const organizationRoutes=require('./src/routes/organization.routes');
 const requestRoutes=require('./src/routes/request.routes');
 const matchingRoutes = require('./src/routes/match.routes');
-const orphanRoutes = require('./routes/orphanRoutes');
-const sponsorshipRoutes = require('./routes/sponsorshipRoutes');
-const reviewRoutes = require('./routes/reviewRoutes');
+const orphanRoutes = require('./src/routes/orphan.routes');
+const sponsorshipRoutes = require('./src/routes/sponsorship.routes');
+const reviewRoutes = require('./src/routes/review.routes');
 
 // create express app
 const app = express();

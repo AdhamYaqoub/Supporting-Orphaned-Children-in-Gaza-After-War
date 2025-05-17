@@ -1,19 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middleware/authMiddleware');
-const authorizeRoles = require('../middleware/authMiddleware').authorizeRoles;
+const uthorizeRoles = require('./../middleware/authMiddleware'); 
 const {
     createOrphan,
     getOrphans,
     getOrphanById,
     updateOrphan,
     deleteOrphan
-} = require('../controllers/orphanController');
+} = require('../controllers/orphan.controller');
 
-router.post('/', authMiddleware, authorizeRoles(['admin', 'orphanage']), createOrphan);
+router.post('/', authMiddleware, uthorizeRoles(['admin', 'orphanage']), createOrphan);
 router.get('/', authMiddleware, getOrphans);
 router.get('/:orphanId', authMiddleware, getOrphanById);
-router.put('/:orphanId', authMiddleware, authorizeRoles(['admin', 'orphanage']), updateOrphan);
-router.delete('/:orphanId', authMiddleware, authorizeRoles(['admin', 'orphanage']), deleteOrphan);
+router.put('/:orphanId', authMiddleware, uthorizeRoles(['admin', 'orphanage']), updateOrphan);
+router.delete('/:orphanId', authMiddleware, uthorizeRoles(['admin', 'orphanage']), deleteOrphan);
 
 module.exports = router;
