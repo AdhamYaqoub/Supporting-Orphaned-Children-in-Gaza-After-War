@@ -51,9 +51,6 @@ app.use("/api/VolunteerApplication", VolunteerApplicationRoutes);
 app.use("/api/orphans", orphanRoutes);
 app.use("/api/sponsorships", sponsorshipRoutes);
 app.use("/api/reviews", reviewRoutes);
-app.use("/api/orphans", orphanRoutes);
-app.use("/api/sponsorships", sponsorshipRoutes);
-app.use("/api/reviews", reviewRoutes);
 
 // **Test database connection**
 sequelize
@@ -63,8 +60,8 @@ sequelize
 
 // **Sync models with the database** (preferably used only during development)
 sequelize
-  .sync({ alter: true }) // Set to true only during development to drop and recreate tables
-  //
+  .sync() // Set to true only during development to drop and recreate tables
+  //{ alter: true }
   .then(() => console.log("🔄 Database synced"))
   .catch((err) => console.error("⚠️ Error syncing database:", err));
 
