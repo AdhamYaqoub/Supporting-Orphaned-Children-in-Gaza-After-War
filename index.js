@@ -18,6 +18,8 @@ const reviewRoutes = require("./src/routes/review.routes");
 const VolunteerApplicationRoutes = require("./src/routes/volunteerApplication.routes");
 const orphanUpdateRoutes = require("./src/routes/orphanUpdate.routes");
 const dashboardController = require("./src/controllers/dashboard.controller"); // Import dashboard controller
+const deliveryRoutes = require('./src/routes/delivery.routes'); // Import delivery routes
+
 // create express app
 const app = express();
 
@@ -54,6 +56,9 @@ app.use("/api/sponsorships", sponsorshipRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/orphan-updates", orphanUpdateRoutes);
 app.use("/api/dashboard", dashboardController.getStats);
+app.use('/api/delivery', deliveryRoutes);
+
+
 // **Test database connection**
 sequelize
   .authenticate()
@@ -61,8 +66,8 @@ sequelize
   .catch((err) => console.error("❌ Unable to connect to the database:", err));
 
 // **Sync models with the database** (preferably used only during development)
-//sequelize.sync({alter:true}) // Set to true only during development to drop and recreate tables
-sequelize.sync()
+sequelize.sync({alter:true}) // Set to true only during development to drop and recreate tables
+//sequelize.sync()
   .then(() => console.log("🔄 Database synced"))
   .catch((err) => console.error("⚠️ Error syncing database:", err));
 

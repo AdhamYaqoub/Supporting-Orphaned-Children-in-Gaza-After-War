@@ -4,9 +4,12 @@ const { Op } = require("sequelize");
 const User = require("../models/User");
 const Volunteer = require("../models/Volunteer");
 const Organization = require("../models/Organization");
+const axios = require('axios');
+
 // const sponsor = require("../models/Sponsor");
 
 let activeTokens = new Set();
+
 
 exports.register = async (req, res) => {
   try {
@@ -23,15 +26,17 @@ exports.register = async (req, res) => {
       contact_email,
     } = req.body;
 
+    // التحقق من الحقول المطلوبة
     if (!name || !email || !password || !role) {
-      return res
-        .status(400)
-        .json({
-          error: "All fields (name, email, password, role) are required",
-        });
+      return res.status(400).json({
+        error: "All fields (name, email, password, role) are required",
+      });
     }
 
+    // تجزئة كلمة السر
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    // إنشاء المستخدم
     const newUser = await User.create({
       name,
       email,
@@ -39,6 +44,31 @@ exports.register = async (req, res) => {
       role,
     });
 
+    // تعريف المتغيرين للإحداثيات
+    let latitude = null;
+    let longitude = null;
+
+    // لو الدور orphanage، نحصل الإحداثيات من عنوان المنظمة
+    if (role === "orphanage" && address) {
+      try {
+        const response = await axios.get('https://nominatim.openstreetmap.org/search', {
+          params: {
+            q: address,
+            format: 'json',
+            limit: 1,
+          }
+        });
+        if (response.data && response.data.length > 0) {
+          latitude = response.data[0].lat;
+          longitude = response.data[0].lon;
+        }
+      } catch (error) {
+        console.error('Error fetching geolocation:', error.message);
+        // ممكن تختار تتابع أو ترجع خطأ هنا حسب متطلباتك
+      }
+    }
+
+    // بناءً على الدور، ننشئ السجل المناسب
     if (role === "volunteer") {
       await Volunteer.create({
         user_id: newUser.id,
@@ -54,6 +84,8 @@ exports.register = async (req, res) => {
         address,
         phone_number,
         contact_email,
+        latitude,
+        longitude,
       });
     }
 
@@ -66,6 +98,7 @@ exports.register = async (req, res) => {
     res.status(500).json({ error: "Error registering user" });
   }
 };
+
 
 exports.login = async (req, res) => {
   try {
