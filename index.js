@@ -20,7 +20,7 @@ const orphanUpdateRoutes = require("./src/routes/orphanUpdate.routes");
 const dashboardController = require("./src/controllers/dashboard.controller"); // Import dashboard controller
 // const deliveryRoutes = require("./src/routes/delivery.routes"); // Import delivery routes
 const setupDeliveryWebSocket = require("./src/services/deliverySocket");
-const deliveryRoutes = require('./src/routes/deliveryAssignment.routes');
+const deliveryRoutes = require("./src/routes/deliveryAssignment.routes");
 const http = require("http");
 
 // create express app
