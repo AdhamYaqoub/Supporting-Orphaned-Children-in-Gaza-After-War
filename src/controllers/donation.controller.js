@@ -1,9 +1,10 @@
 const { Donation, Transaction, EmergencyCampaign, sequelize, User } = require('../models');
 const nodemailer = require("nodemailer");
+const axios = require('axios');
 
 exports.createDonation = async (req, res) => {
   try {
-    const { name, amount, category, organization_id, donation_item, quantity, campaign_id } = req.body;
+    const { name, amount, category, organization_id, donation_item, quantity, campaign_id, pickup_address } = req.body;
 
     if (!organization_id && !campaign_id) {
       return res.status(400).json({ error: 'Please provide either organization_id or campaign_id' });
@@ -20,17 +21,42 @@ exports.createDonation = async (req, res) => {
       }
     }
 
-    const donation = await Donation.create({
-      user_id: req.user.id,
-      name,
-      amount,
-      category,
-      organization_id,
-      campaign_id,
-      donation_item,
-      quantity
-    });
+    // 👇 تحقق إن التبرع مادي أو مادي وأغراض وكان فيه عنوان للتسليم
+    let latitude = null;
+    let longitude = null;
 
+    if ((donation_item || quantity) && pickup_address) {
+      // جلب الإحداثيات باستخدام Nominatim API
+      const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(pickup_address)}`;
+
+      const geoRes = await axios.get(geocodeUrl);
+      if (geoRes.data.length > 0) {
+        latitude = geoRes.data[0].lat;
+        longitude = geoRes.data[0].lon;
+      } else {
+        return res.status(400).json({ error: 'Unable to geocode pickup address.' });
+      }
+    } else if ((donation_item || quantity) && !pickup_address) {
+      return res.status(400).json({ error: 'Pickup address is required for physical donations.' });
+    }
+const donationStatus = amount ? 'delivered' : 'pending';
+
+const donation = await Donation.create({
+  user_id: req.user.id,
+  name,
+  amount,
+  category,
+  organization_id,
+  campaign_id,
+  donation_item,
+  quantity,
+  pickup_address,
+  latitude,
+  longitude,
+  status: donationStatus
+});
+
+    // لو فيه مبلغ مالي ننشئ المعاملة ونحدّث حملات الطوارئ
     if (amount) {
       const fee = parseFloat(amount) * 0.05;
       const totalAmount = parseFloat(amount) - fee;
@@ -56,8 +82,10 @@ exports.createDonation = async (req, res) => {
           await updatedCampaign.update({ status: 'completed' });
         }
       }
+    }
 
-      // 💌 إرسال الإيميل للمتبرع
+    // إرسال الإيميل لو فيه مبلغ أو أغراض
+    if (amount || donation_item) {
       const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -65,24 +93,34 @@ exports.createDonation = async (req, res) => {
           pass: process.env.EMAIL_PASSWORD,
         },
       });
+
       const user = await User.findOne({ where: { id: req.user.id } });
 
+      // تجهيز نص التبرع ليشمل المبلغ والأغراض
+      let donationDetails = '';
+      if (amount) {
+        donationDetails += `a monetary donation of $${amount}`;
+      }
+      if (donation_item) {
+        if (donationDetails.length > 0) donationDetails += ' and ';
+        donationDetails += `${quantity ? quantity + ' x ' : ''}${donation_item}`;
+      }
 
       const mailOptions = {
-  from: process.env.EMAIL,
-  to: req.user.email,
-  subject: "✅ Donation Confirmation",
-  text: `Dear ${user.name},
+        from: process.env.EMAIL,
+        to: req.user.email,
+        subject: "✅ Donation Confirmation",
+        text: `Dear ${user.name},
 
 Thank you for your generous donation.
 
-We are pleased to inform you that a donation of $${amount} has been successfully processed from your account in support of the cause${campaign_id ? ' in the emergency campaign' : ''}.
+We are pleased to inform you that your donation (${donationDetails}) has been successfully processed${campaign_id ? ' in the emergency campaign' : ''}.
 
 Your contribution is truly appreciated and will go a long way in helping those in need.
 
 Best regards,  
 Supporting Orphaned Children Team`
-};
+      };
 
       await transporter.sendMail(mailOptions);
     }
@@ -93,6 +131,7 @@ Supporting Orphaned Children Team`
     res.status(400).json({ error: err.message });
   }
 };
+
 
 exports.getAllDonations = async (req, res) => {
   try {
