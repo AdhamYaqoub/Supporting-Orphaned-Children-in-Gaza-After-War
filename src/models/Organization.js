@@ -9,6 +9,9 @@ const Organization = sequelize.define('Organization', {
     address: DataTypes.STRING,
     phone_number: DataTypes.STRING,
     contact_email:{ type: DataTypes.STRING, unique: true, allowNull: false },
+      // ✅ خطوط العرض والطول لتحديد موقع المنظمة على الخريطة
+  latitude: { type: DataTypes.DOUBLE },   // مثال: 31.9522
+  longitude: { type: DataTypes.DOUBLE },  // مثال: 35.2332
     verified: { type: DataTypes.BOOLEAN, defaultValue: false },
     created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
 },
