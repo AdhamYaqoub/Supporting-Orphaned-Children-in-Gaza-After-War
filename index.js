@@ -18,8 +18,9 @@ const reviewRoutes = require("./src/routes/review.routes");
 const VolunteerApplicationRoutes = require("./src/routes/volunteerApplication.routes");
 const orphanUpdateRoutes = require("./src/routes/orphanUpdate.routes");
 const dashboardController = require("./src/controllers/dashboard.controller"); // Import dashboard controller
-const deliveryRoutes = require("./src/routes/delivery.routes"); // Import delivery routes
+// const deliveryRoutes = require("./src/routes/delivery.routes"); // Import delivery routes
 const setupDeliveryWebSocket = require("./src/services/deliverySocket");
+const deliveryRoutes = require('./src/routes/deliveryAssignment.routes');
 const http = require("http");
 
 // create express app
@@ -72,7 +73,7 @@ sequelize
 // **Sync models with the database** (preferably used only during development)
 //sequelize.sync({ alter: true }) // Set to true only during development to drop and recreate tables
 sequelize
-  .sync()
+  .sync() // Set to true only during development to drop and recreate tables
   .then(() => console.log("🔄 Database synced"))
   .catch((err) => console.error("⚠️ Error syncing database:", err));
 
