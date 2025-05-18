@@ -15,7 +15,7 @@ const Request = sequelize.define(
       allowNull: true,
     },
     service_needed: {
-      type: DataTypes.ENUM("teaching", "mentoring", "healthcare"),
+      type: DataTypes.ENUM("teaching", "mentoring", "healthcare", "delivery"),
       allowNull: false,
     },
     Publication_date: {

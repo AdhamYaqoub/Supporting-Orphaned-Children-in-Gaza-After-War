@@ -10,10 +10,16 @@ router.get(
   requestController.getAllRequests
 );
 router.get(
+  "/getAllMatchRequests",
+  uthorizeRoles(["admin", "volunteer"]),
+  requestController.getMatchingRequests
+);
+router.get(
   "/:requestId",
   uthorizeRoles(["admin", "volunteer"]),
   requestController.getRequestById
 );
+
 router.put(
   "/:requestId",
   uthorizeRoles(["orphanage"]),

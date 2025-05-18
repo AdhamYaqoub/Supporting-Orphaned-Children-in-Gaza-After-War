@@ -3,6 +3,8 @@ const VolunteerApplication = require("../models/VolunteerApplication");
 const Request = require("../models/Request");
 const Organization = require("../models/Organization");
 const User = require("../models/User");
+const OrganizationVolunteer = require("../models/OrganizationVolunteer"); // استورد الموديل
+
 exports.applyToRequest = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -117,7 +119,6 @@ exports.updateApplicationStatus = async (req, res) => {
       return res.status(400).json({ error: "Invalid status value" });
     }
 
-    // جلب الطلب المرتبط بالتقديم باستخدام alias matchedRequest
     const application = await VolunteerApplication.findByPk(applicationId, {
       include: [{ model: Request, as: "matchedRequest" }],
     });
@@ -126,24 +127,23 @@ exports.updateApplicationStatus = async (req, res) => {
       return res.status(404).json({ error: "Application not found" });
     }
 
-    // التحقق من أن الطلب يخص المنظمة الحالية
     if (application.matchedRequest.organization_id !== organization.id) {
-      console.log(
-        "application.matchedRequest.organization_id:",
-        application.matchedRequest.organization_id
-      );
-      console.log("Current user id (req.user.id):", req.user.id);
       return res
         .status(403)
         .json({ error: "Not authorized to update this application" });
     }
 
-    // تحديث حالة التقديم
     application.status = status;
     await application.save();
 
-    // التحقق من اكتمال عدد المتطوعين فقط إذا تم القبول
     if (status === "accepted") {
+      // إضافة المتطوع إلى جدول OrganizationVolunteer
+      await OrganizationVolunteer.create({
+        organization_id: organization.id,
+        volunteer_id: application.volunteer_id,
+      });
+
+      // التحقق من اكتمال عدد المتطوعين
       const acceptedCount = await VolunteerApplication.count({
         where: {
           request_id: application.request_id,
@@ -152,7 +152,6 @@ exports.updateApplicationStatus = async (req, res) => {
       });
 
       if (acceptedCount >= application.matchedRequest.required_volunteers) {
-        // تحديث حالة الطلب إلى completed
         application.matchedRequest.status = "completed";
         await application.matchedRequest.save();
       }
