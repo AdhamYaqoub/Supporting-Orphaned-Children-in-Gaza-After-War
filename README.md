@@ -24,7 +24,7 @@ HopeConnect is a humanitarian platform built to support and manage orphaned chil
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/https://github.com/Mohammadbadawi01/Supporting-Orphaned-Children-in-Gaza-After-War.git/hopeconnect-backend.git
+   git clone https://github.com/Mohammadbadawi01/Supporting-Orphaned-Children-in-Gaza-After-War.git
    cd hopeconnect-backend
 
 ---
