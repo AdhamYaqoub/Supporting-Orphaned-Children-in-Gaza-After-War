@@ -69,18 +69,16 @@ exports.getMatchingRequests = async (req, res) => {
         return res.status(404).json({ message: "Volunteer profile not found" });
       }
 
-      // استبعاد الطلبات التي تقدم عليها بالفعل
       const appliedRequestIds = await VolunteerApplication.findAll({
         where: { volunteer_id: volunteer.id },
         attributes: ["request_id"],
       }).then((matches) => matches.map((m) => m.request_id));
 
-      // جلب الطلبات المتوافقة مع نوع خدمة المتطوع ولم يقدم عليها بعد
       const matchingRequests = await Request.findAll({
         where: {
           service_needed: volunteer.service_type,
           status: "pending",
-          id: { [Op.notIn]: appliedRequestIds }, // استبعاد الطلبات المقدمة
+          id: { [Op.notIn]: appliedRequestIds }, 
         },
       });
 
@@ -170,40 +168,4 @@ exports.deleteRequest = async (req, res) => {
     res.status(500).json({ error: "Error deleting service request" });
   }
 };
-
-// exports.applyToRequest = async (req, res) => {
-//   try {
-//     const userId = req.user.id;
-//     const requestId = req.params.requestId;
-
-//     const volunteer = await Volunteer.findOne({ where: { user_id: userId } });
-//     if (!volunteer) {
-//       return res.status(404).json({ message: "Volunteer not found" });
-//     }
-
-//     // تحقق إذا تقدم بالفعل
-//     const alreadyApplied = await VolunteerApplication.findOne({
-//       where: {
-//         volunteer_id: volunteer.id,
-//         request_id: requestId,
-//       },
-//     });
-
-//     if (alreadyApplied) {
-//       return res.status(400).json({ message: "Already applied to this request" });
-//     }
-
-//     // إنشاء تقديم جديد
-//     const application = await VolunteerApplication.create({
-//       volunteer_id: volunteer.id,
-//       request_id: requestId,
-//       status: "pending", // أو status = approved مباشرة حسب النظام
-//     });
-
-//     res.status(201).json({ message: "Applied successfully", application });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ message: "Failed to apply to the request" });
-//   }
-// };
 

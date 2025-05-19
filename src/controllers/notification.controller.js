@@ -1,11 +1,9 @@
 const { Notification, User } = require("../models");
 
-// ✅ إرسال إشعار
 exports.sendNotification = async (req, res) => {
   try {
     const { message, userId } = req.body;
 
-    // تحقق من وجود المستخدم
     const user = await User.findByPk(userId);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -24,7 +22,6 @@ exports.sendNotification = async (req, res) => {
   }
 };
 
-// ✅ عرض إشعارات المستخدم
 exports.getUserNotifications = async (req, res) => {
   try {
     const userId = req.user.id;

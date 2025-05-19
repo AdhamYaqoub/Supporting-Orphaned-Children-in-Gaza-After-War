@@ -7,7 +7,6 @@ function setupDeliveryWebSocket(server) {
   const wss = new WebSocket.Server({ server });
 
   wss.on("connection", (ws, req) => {
-    // الحصول على التوكن من الهيدر أو URL
     const token = req.url?.split("token=")[1];
 
     if (!token) {
@@ -15,18 +14,16 @@ function setupDeliveryWebSocket(server) {
       return;
     }
 
-    // فك التوكن والتحقق
     let decoded;
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
-      ws.user = decoded; // تخزين معلومات المستخدم مع الـ WebSocket
+      ws.user = decoded; 
       console.log("🟢 WebSocket connected for user:", decoded.email);
     } catch (err) {
       ws.close(4002, "Invalid token");
       return;
     }
 
-    // استقبال الرسائل
     ws.on("message", async (message) => {
       try {
         const data = JSON.parse(message);

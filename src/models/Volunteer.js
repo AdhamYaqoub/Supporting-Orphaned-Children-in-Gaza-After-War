@@ -6,25 +6,25 @@ const Volunteer = sequelize.define(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
 
-    user_id: { type: DataTypes.INTEGER, allowNull: false }, // رابط مع جدول المستخدمين
+    user_id: { type: DataTypes.INTEGER, allowNull: false }, 
 
     full_name: { type: DataTypes.STRING, allowNull: false },
     phone_number: { type: DataTypes.STRING, allowNull: false },
 
-    service_type: DataTypes.ENUM("teaching", "mentoring", "healthcare", "delivery"), // ✅ أضفنا delivery للخدمات اللوجستية
+    service_type: DataTypes.ENUM("teaching", "mentoring", "healthcare", "delivery"),
 
-    availability: DataTypes.TEXT, // جدول متى متاح للعمل
+    availability: DataTypes.TEXT, 
     status: {
       type: DataTypes.ENUM("active", "inactive", "suspended"),
-      defaultValue: "active", // ✅ حالة المتطوع (مفعل/موقوف)
+      defaultValue: "active", 
     },
 
-    latitude: { type: DataTypes.FLOAT },   // ✅ الموقع الحالي
-    longitude: { type: DataTypes.FLOAT },  // ✅ الموقع الحالي
+    latitude: { type: DataTypes.FLOAT },  
+    longitude: { type: DataTypes.FLOAT },  
 
     verification_status: {
       type: DataTypes.ENUM("pending", "verified", "rejected"),
-      defaultValue: "pending", // ✅ حالة التحقق من الهوية
+      defaultValue: "pending", 
     },
 
     created_at: {

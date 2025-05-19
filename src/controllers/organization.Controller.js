@@ -24,9 +24,7 @@ exports.updateOrganization= async (req, res) => {
   const { name_orphanage, address, phone_number, contact_email, verified } = req.body;
   
   try {
-    // تحقق من إذا كان المستخدم Admin
     if (req.user.role === 'admin') {
-      // إذا كان Admin يمكنه تحديث verified
       const updatedOrg = await Organization.update(
         { name_orphanage, address, phone_number, contact_email, verified },
         { where: { id: organizationId } }
@@ -34,19 +32,16 @@ exports.updateOrganization= async (req, res) => {
       return res.status(200).json({ message: 'Organization updated successfully', updatedOrg });
     }
 
-    // إذا كان Orphanage فقط، يمكنه تحديث بياناته ولكن لا يستطيع تعديل verified
     if (req.user.role === 'orphanage') {
-      // تحقق من أن الـ orphanage لا يمكنه تعديل بيانات منظمة أخرى
       const organization = await Organization.findByPk(organizationId);
 
-      // تأكد من أن الـ user_id الخاص بالـ orphanage يتطابق مع الـ organizationId
       if (organization.user_id !== req.user.id) {
         return res.status(403).json({ message: 'You can only update your own organization' });
       }
 
       const updatedOrg = await Organization.update(
         { name_orphanage, address, phone_number, contact_email },
-        { where: { id: organizationId, user_id: req.user.id } } // تأكد من أن الـ orphanage يمكنه تعديل بياناته فقط
+        { where: { id: organizationId, user_id: req.user.id } } 
       );
       return res.status(200).json({ message: 'Organization updated successfully', updatedOrg });
     }

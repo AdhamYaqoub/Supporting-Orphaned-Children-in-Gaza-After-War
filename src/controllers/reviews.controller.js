@@ -35,7 +35,7 @@ exports.updateReview = async (req, res) => {
         if (review.user_id !== req.user.id && req.user.role !== 'admin') {
             return res.status(403).json({ error: 'Unauthorized' });
         }
-        await review.update(req.body);   // <- كملنا هنا
+        await review.update(req.body);   
         res.json(review);
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -47,7 +47,6 @@ exports.deleteReview = async (req, res) => {
         const review = await Review.findByPk(req.params.reviewId);
         if (!review) return res.status(404).json({ error: 'Review not found' });
         
-        // تحقق إن المستخدم إما هو صاحب الريفيو أو أدمن
         if (review.user_id !== req.user.id && req.user.role !== 'admin') {
             return res.status(403).json({ error: 'Unauthorized' });
         }

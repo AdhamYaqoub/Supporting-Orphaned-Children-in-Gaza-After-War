@@ -21,12 +21,10 @@ exports.createDonation = async (req, res) => {
       }
     }
 
-    // 👇 تحقق إن التبرع مادي أو مادي وأغراض وكان فيه عنوان للتسليم
     let latitude = null;
     let longitude = null;
 
     if ((donation_item || quantity) && pickup_address) {
-      // جلب الإحداثيات باستخدام Nominatim API
       const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(pickup_address)}`;
 
       const geoRes = await axios.get(geocodeUrl);
@@ -56,7 +54,7 @@ const donation = await Donation.create({
   status: donationStatus
 });
 
-    // لو فيه مبلغ مالي ننشئ المعاملة ونحدّث حملات الطوارئ
+ 
     if (amount) {
       const fee = parseFloat(amount) * 0.05;
       const totalAmount = parseFloat(amount) - fee;
@@ -84,7 +82,6 @@ const donation = await Donation.create({
       }
     }
 
-    // إرسال الإيميل لو فيه مبلغ أو أغراض
     if (amount || donation_item) {
       const transporter = nodemailer.createTransport({
         service: "gmail",

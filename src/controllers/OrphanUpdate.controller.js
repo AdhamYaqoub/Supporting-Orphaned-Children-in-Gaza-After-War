@@ -1,6 +1,5 @@
 const { OrphanUpdate } = require("../models");
 
-// إنشاء تحديث جديد
 exports.createUpdate = async (req, res) => {
   try {
     const { orphan_id, update_type, description, photo_url, date } = req.body;
@@ -24,7 +23,6 @@ exports.createUpdate = async (req, res) => {
   }
 };
 
-// جلب كل التحديثات ليتيم معين
 exports.getUpdatesByOrphan = async (req, res) => {
   try {
     const { orphanId } = req.params;
@@ -40,7 +38,6 @@ exports.getUpdatesByOrphan = async (req, res) => {
   }
 };
 
-// جلب تحديث معين حسب id
 exports.getUpdateById = async (req, res) => {
   try {
     const update = await OrphanUpdate.findByPk(req.params.updateId);
@@ -51,7 +48,6 @@ exports.getUpdateById = async (req, res) => {
   }
 };
 
-// تعديل تحديث
 exports.updateUpdate = async (req, res) => {
   try {
     const update = await OrphanUpdate.findByPk(req.params.updateId);
@@ -64,7 +60,6 @@ exports.updateUpdate = async (req, res) => {
   }
 };
 
-// حذف تحديث
 exports.deleteUpdate = async (req, res) => {
   try {
     const update = await OrphanUpdate.findByPk(req.params.updateId);

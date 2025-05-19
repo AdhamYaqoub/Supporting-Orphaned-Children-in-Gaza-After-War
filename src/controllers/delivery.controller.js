@@ -10,7 +10,6 @@ exports.assignVolunteerToDonation = async (req, res) => {
   try {
     const { donationId, volunteerId } = req.body;
 
-    // تأكد أن المستخدم هو منظمة
     if (req.user.role !== "orphanage") {
       return res.status(403).json({
         error: "Only organizations can assign volunteers to donations.",
@@ -26,7 +25,6 @@ exports.assignVolunteerToDonation = async (req, res) => {
       },
     });
 
-    // تأكد أن التبرع يخص نفس المنظمة
     const donation = await Donation.findOne({
       where: { id: donationId, organization_id: Organization.id },
     });
@@ -36,7 +34,6 @@ exports.assignVolunteerToDonation = async (req, res) => {
       });
     }
 
-    // تأكد أن المتطوع تابع للمنظمة من خلال جدول OrganizationVolunteer
     const orgVolunteer = await OrganizationVolunteer.findOne({
       where: {
         organization_id: Organization.id,
@@ -50,7 +47,6 @@ exports.assignVolunteerToDonation = async (req, res) => {
         .json({ error: "Volunteer does not belong to your organization." });
     }
 
-    // تحقق أن الخدمة التي يقدمها المتطوع هي delivery
     const volunteer = await Volunteer.findOne({ where: { id: volunteerId } });
     if (!volunteer || volunteer.service_type !== "delivery") {
       return res
@@ -58,7 +54,6 @@ exports.assignVolunteerToDonation = async (req, res) => {
         .json({ error: "Volunteer does not provide delivery service." });
     }
 
-    // تأكد أن التبرع لم يُسند مسبقًا
     const existingAssignment = await DeliveryAssignment.findOne({
       where: { donation_id: donationId },
     });
@@ -68,7 +63,6 @@ exports.assignVolunteerToDonation = async (req, res) => {
         .json({ error: "This donation is already assigned to a volunteer." });
     }
 
-    // إنشاء السجل
     const assignment = await DeliveryAssignment.create({
       donation_id: donationId,
       volunteer_id: volunteerId,
@@ -86,12 +80,10 @@ exports.assignVolunteerToDonation = async (req, res) => {
   }
 };
 
-// ✅ إحضار جميع المهام المخصصة لمتطوع
 exports.getMyDeliveryAssignments = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // احصل على المتطوع عبر user_id
     const volunteer = await Volunteer.findOne({ where: { user_id: userId } });
 
     if (!volunteer) {

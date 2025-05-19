@@ -21,7 +21,7 @@ const Sponsorship = sequelize.define(
     },
   },
   {
-    timestamps: false, // منع إنشاء createdAt و updatedAt
+    timestamps: false, 
   }
 );
 

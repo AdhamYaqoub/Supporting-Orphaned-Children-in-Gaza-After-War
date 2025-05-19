@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const Donation = require("./Donation");
-const User = require("./User"); // نفترض أن المتطوع هو مستخدم له role: 'volunteer'
+const User = require("./User"); 
 const Volunteer = require("./Volunteer");
 
 const DeliveryAssignment = sequelize.define(
@@ -28,7 +28,6 @@ const DeliveryAssignment = sequelize.define(
   }
 );
 
-// العلاقات
 Donation.hasOne(DeliveryAssignment, { foreignKey: "donation_id" });
 DeliveryAssignment.belongsTo(Donation, { foreignKey: "donation_id" });
 

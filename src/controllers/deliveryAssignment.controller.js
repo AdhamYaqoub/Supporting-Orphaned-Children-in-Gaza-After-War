@@ -3,7 +3,6 @@ const DeliveryAssignment = require('../models/DeliveryAssignment');
 const Donation = require('../models/Donation');
 const Volunteer = require('../models/Volunteer');
 
-// إنشاء مهمة توصيل جديدة
 exports.createAssignment = async (req, res) => {
   try {
     const { donation_id, volunteer_id, notes } = req.body;
@@ -26,7 +25,6 @@ exports.createAssignment = async (req, res) => {
 };
 
 
-// جلب المهام لمتطوع معيّن
 exports.getAssignmentsByVolunteer = async (req, res) => {
   try {
     const { volunteer_id } = req.params;
@@ -44,7 +42,7 @@ exports.getAssignmentsByVolunteer = async (req, res) => {
             { model: Organization, as: 'associatedOrganization' }
           ]
         }
-      ], // Assuming you have a Volunteer model
+      ], 
     });
 
     if (assignments.length === 0) {
@@ -59,7 +57,6 @@ exports.getAssignmentsByVolunteer = async (req, res) => {
 };
 
 
-// تحديث حالة المهمة
 exports.updateStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -75,7 +72,6 @@ exports.updateStatus = async (req, res) => {
   }
 };
 
-// إلغاء مهمة
 exports.cancelAssignment = async (req, res) => {
   try {
     const { id } = req.params;
