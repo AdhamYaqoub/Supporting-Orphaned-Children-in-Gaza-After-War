@@ -35,7 +35,7 @@ exports.forgotPassword = async (req, res) => {
     if (!user) return res.status(404).json({ error: "User not found" });
 
     const resetToken = crypto.randomBytes(20).toString("hex");
-    const resetTokenExpiration = Date.now() + 3600000;
+    const resetTokenExpiration = Date.now() + 3600000; // 1 ساعة
 
     user.resetToken = resetToken;
     user.resetTokenExpiration = resetTokenExpiration;
@@ -54,7 +54,7 @@ exports.forgotPassword = async (req, res) => {
       to: email,
       subject: "Password Reset",
       text: `You requested a password reset. Please click the link below to reset your password:
-            http://localhost:5000/api/auth/reset-password/${resetToken}`,
+http://localhost:5000/api/auth/reset-password/${resetToken}`,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
@@ -70,23 +70,47 @@ exports.forgotPassword = async (req, res) => {
 exports.resetPasswordForm = (req, res) => {
   const { resetToken } = req.params;
   res.send(`
-        <html>
-        <head><title>Reset Password</title></head>
-        <body>
-            <h2>Reset Your Password</h2>
-            <form method="POST" action="/api/auth/reset-password/${resetToken}">
-                <input type="password" name="password" placeholder="New Password" required />
-                <button type="submit">Reset Password</button>
-            </form>
-        </body>
-        </html>
-    `);
+    <html>
+      <head>
+        <title>Reset Password</title>
+        <style>
+          body {
+            font-family: Arial;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 100px;
+          }
+          input {
+            padding: 10px;
+            margin: 10px;
+            width: 250px;
+          }
+          button {
+            padding: 10px 20px;
+          }
+        </style>
+      </head>
+      <body>
+        <h2>Reset Your Password</h2>
+        <form method="POST" action="/api/auth/reset-password/${resetToken}">
+          <input type="password" name="password" placeholder="New Password" required />
+          <br/>
+          <button type="submit">Reset Password</button>
+        </form>
+      </body>
+    </html>
+  `);
 };
 
 exports.resetPassword = async (req, res) => {
   try {
     const { resetToken } = req.params;
     const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ error: "Password is required" });
+    }
 
     const user = await User.findOne({
       where: {
@@ -95,8 +119,9 @@ exports.resetPassword = async (req, res) => {
       },
     });
 
-    if (!user)
+    if (!user) {
       return res.status(404).json({ error: "Invalid or expired reset token" });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     user.password = hashedPassword;
@@ -106,7 +131,7 @@ exports.resetPassword = async (req, res) => {
 
     res.json({ message: "Password reset successfully" });
   } catch (error) {
-    console.error("Reset password error:", error); // ✅ اطبع الخطأ
+    console.error("Reset password error:", error);
     res.status(500).json({ error: "Error resetting password" });
   }
 };

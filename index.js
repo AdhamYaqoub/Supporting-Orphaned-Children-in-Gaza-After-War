@@ -25,15 +25,14 @@ const http = require("http");
 
 // create express app
 const app = express();
-
-app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // يدعم البيانات القادمة من form
+app.use(express.json()); // يدعم البيانات القادمة بصيغة JSON
 
 // add routes
 app.use("/api/users", usersRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/notifications", notificationsRoutes);
-app.use(express.urlencoded({ extended: true }));
 
 // Middleware** to parse JSON data in requests
 app.use(bodyParser.json());

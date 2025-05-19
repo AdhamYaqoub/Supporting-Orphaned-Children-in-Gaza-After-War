@@ -17,7 +17,7 @@ exports.createSponsorship = async (req, res) => {
       payment_frequency = "monthly",
     } = req.body;
 
-    if (!orphan_id || !amount || !start_date || !end_date) {
+    if (!orphan_id || !start_date || !end_date) {
       return res.status(400).json({ error: "Missing required fields." });
     }
 
