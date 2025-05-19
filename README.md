@@ -26,3 +26,25 @@ HopeConnect is a humanitarian platform built to support and manage orphaned chil
    ```bash
    git clone https://github.com/https://github.com/Mohammadbadawi01/Supporting-Orphaned-Children-in-Gaza-After-War.git/hopeconnect-backend.git
    cd hopeconnect-backend
+
+---
+
+## Install the required packages:
+ ### npm install
+
+ ---
+
+## Create a .env file in the root directory and add the following environment variables:
+  ### PORT=3000
+  ### DB_HOST=localhost
+  ### DB_USER=root
+  ### DB_PASSWORD=yourpassword
+  ### DB_NAME=hopeconnect
+  ### JWT_SECRET=your_jwt_secret
+  ### EMAIL=your_email
+  ### EMAIL_PASSWORD= your_EMAIL_PASSWORD
+
+  ---
+
+## Start the server:
+ ### node ./index.js
