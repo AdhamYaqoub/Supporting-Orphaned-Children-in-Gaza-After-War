@@ -10,7 +10,6 @@ exports.applyToRequest = async (req, res) => {
     const userId = req.user.id;
     const { request_id, message } = req.body;
 
-    // الحصول على ملف المتطوع
     const volunteer = await Volunteer.findOne({ where: { user_id: userId } });
     if (!volunteer) {
       return res
@@ -18,20 +17,17 @@ exports.applyToRequest = async (req, res) => {
         .json({ message: "لم يتم العثور على ملف المتطوع." });
     }
 
-    // الحصول على الطلب
     const request = await Request.findOne({ where: { id: request_id } });
     if (!request) {
       return res.status(404).json({ message: "الطلب غير موجود." });
     }
 
-    // التحقق من توافق نوع الخدمة
     if (request.service_needed !== volunteer.service_type) {
       return res.status(400).json({
         message: "لا يمكنك التقديم على هذا الطلب لأنه لا يتوافق مع نوع خدمتك.",
       });
     }
 
-    // التأكد من عدم التقديم المسبق
     const existingApplication = await VolunteerApplication.findOne({
       where: {
         volunteer_id: volunteer.id,
@@ -43,7 +39,6 @@ exports.applyToRequest = async (req, res) => {
       return res.status(400).json({ message: "لقد تقدمت لهذا الطلب مسبقًا." });
     }
 
-    // إنشاء التقديم مع الرسالة فقط
     await VolunteerApplication.create({
       volunteer_id: volunteer.id,
       request_id: request.id,
@@ -137,13 +132,11 @@ exports.updateApplicationStatus = async (req, res) => {
     await application.save();
 
     if (status === "accepted") {
-      // إضافة المتطوع إلى جدول OrganizationVolunteer
       await OrganizationVolunteer.create({
         organization_id: organization.id,
         volunteer_id: application.volunteer_id,
       });
 
-      // التحقق من اكتمال عدد المتطوعين
       const acceptedCount = await VolunteerApplication.count({
         where: {
           request_id: application.request_id,

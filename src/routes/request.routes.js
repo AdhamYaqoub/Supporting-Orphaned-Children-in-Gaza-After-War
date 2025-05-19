@@ -31,7 +31,6 @@ router.delete(
   requestController.deleteRequest
 );
 
-// router.post("/:requestId/apply",uthorizeRoles(["volunteer"]), requestController.applyToRequest);
 
 
 module.exports = router;

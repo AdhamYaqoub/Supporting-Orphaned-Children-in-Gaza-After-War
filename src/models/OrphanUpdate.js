@@ -18,7 +18,7 @@ const OrphanUpdate = sequelize.define(
       allowNull: true,
     },
     media_url: {
-      type: DataTypes.STRING, // رابط للصورة أو الملف أو الفيديو
+      type: DataTypes.STRING, 
       allowNull: true,
     },
     update_date: {

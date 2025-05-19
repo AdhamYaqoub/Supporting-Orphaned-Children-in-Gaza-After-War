@@ -26,7 +26,6 @@ exports.updateVolunteer = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // 1. البحث عن المتطوع بناءً على user_id
     const volunteer = await Volunteer.findOne({ where: { user_id: userId } });
     if (!volunteer) {
       return res
@@ -36,7 +35,6 @@ exports.updateVolunteer = async (req, res) => {
 
     const volunteerId = volunteer.id;
 
-    // 3. تحديث بيانات المتطوع
     await Volunteer.update(req.body, {
       where: { id: volunteerId },
     });
@@ -57,29 +55,7 @@ exports.deleteVolunteer = async (req, res) => {
   }
 };
 
-// exports.getVolunteersByOrphanageId = async (req, res) => {
-//   try {
-//     const { orphanageId } = req.params;
 
-//     const organization = await Organization.findByPk(orphanageId, {
-//       include: [
-//         {
-//           model: Volunteer,
-//           through: { attributes: [] }, // لإخفاء الجدول الوسيط
-//         },
-//       ],
-//     });
-
-//     if (!organization) {
-//       return res.status(404).json({ message: "Organization not found" });
-//     }
-
-//     return res.status(200).json(organization.Volunteers);
-//   } catch (error) {
-//     console.error("Error fetching volunteers:", error);
-//     return res.status(500).json({ message: "Server error" });
-//   }
-// };
 
 exports.getMyVolunteers = async (req, res) => {
   try {

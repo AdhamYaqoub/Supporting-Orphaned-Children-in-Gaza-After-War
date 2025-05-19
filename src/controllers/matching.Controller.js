@@ -1,19 +1,15 @@
-// controllers/matchingController.js
 const Volunteer = require("../models/Volunteer");
 const Request = require("../models/Request");
 const VolunteerApplication = require("../models/VolunteerApplication");
 
-// العثور على المتطوعين المناسبين لطلب معين
 async function matchVolunteersToRequest(req, res) {
-  const { requestId } = req.params; // تحديد الـ requestId من الرابط
+  const { requestId } = req.params; 
   try {
-    // البحث عن الطلب بناءً على requestId
     const request = await Request.findByPk(requestId);
     if (!request) {
       return res.status(404).json({ message: "طلب الخدمة غير موجود" });
     }
 
-    // العثور على المتطوعين الذين يقدمون نفس نوع الخدمة المطلوبة
     const volunteers = await Volunteer.findAll({
       where: { service_type: request.service_needed },
     });
@@ -22,7 +18,6 @@ async function matchVolunteersToRequest(req, res) {
       return res.status(404).json({ message: "لا يوجد متطوعون مناسبون" });
     }
 
-    // تحديث حالة الطلب إلى "matched"
     await request.update({ status: "matched" });
 
     return res.status(200).json({

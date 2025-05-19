@@ -5,12 +5,12 @@ exports.getStats = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // عدد التبرعات الكلي للمتبرع
+
     const donationCount = await Donation.count({
       where: { user_id:userId },
     });
 
-    // مجموع التبرعات للمتبرع حسب الفئة
+
     const donationsByCategory = await Donation.findAll({
       where: { user_id:userId },
       attributes: [
@@ -20,7 +20,7 @@ exports.getStats = async (req, res) => {
       group: ["category"],
     });
 
-    // صياغة النتائج بشكل أبسط
+
     const categorySummary = {};
     donationsByCategory.forEach((entry) => {
       categorySummary[entry.category] = parseFloat(entry.dataValues.totalAmount);
@@ -42,7 +42,6 @@ exports.getLogs = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // آخر 10 تبرعات للمتبرع مع تفاصيل أكثر
     const logs = await Donation.findAll({
       where: { user_id:userId },
       order: [["created_at", "DESC"]],
