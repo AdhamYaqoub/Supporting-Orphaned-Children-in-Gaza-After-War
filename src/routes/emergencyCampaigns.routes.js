@@ -10,3 +10,4 @@ router.get('/campaigns/:campaignId', campaignController.getCampaignById);
 router.put('/campaigns/:campaignId', uthorizeRoles(['orphanage']), campaignController.updateCampaign);
 router.delete('/campaigns/:campaignId', uthorizeRoles(['orphanage', 'admin']), campaignController.deleteCampaign);
 module.exports = router;
+

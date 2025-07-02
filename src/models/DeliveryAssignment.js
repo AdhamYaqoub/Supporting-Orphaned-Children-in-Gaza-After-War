@@ -7,6 +7,7 @@ const Volunteer = require("./Volunteer");
 const DeliveryAssignment = sequelize.define(
   "DeliveryAssignment",
   {
+    
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     donation_id: { type: DataTypes.INTEGER, allowNull: false },
     volunteer_id: { type: DataTypes.INTEGER, allowNull: false },

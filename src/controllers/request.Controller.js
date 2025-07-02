@@ -15,6 +15,7 @@ exports.createRequest = async (req, res) => {
         .status(404)
         .json({ error: "Organization not found for this user" });
     }
+    
     const request = await Request.create({
       ...req.body,
       organization_id: organization.id,

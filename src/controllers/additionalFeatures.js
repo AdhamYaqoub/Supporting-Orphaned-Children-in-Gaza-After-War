@@ -10,6 +10,7 @@ exports.searchData = async (req, res) => {
 
     let donations, campaigns;
 
+    
     if (req.user.role === "admin") {
       donations = await Donation.findAll({ where: { name: { [Op.like]: `%${query}%` } } });
       campaigns = await EmergencyCampaign.findAll({ where: { title: { [Op.like]: `%${query}%` } } });

@@ -146,10 +146,11 @@ index.js             ← Entry point
 .env                 ← Environment configs
 README.md            ← Quick setup guide
 
+
 📌 How to Run the System
 Clone the repo:
 
-git clone https://github.com/Mohammadbadawi01/Supporting-Orphaned-Children-in-Gaza-After-War.git
+git clone https://github.com/AdhamYaqoub/Supporting-Orphaned-Children-in-Gaza-After-War.git
 cd orphan-support-system
 
 Install dependencies:

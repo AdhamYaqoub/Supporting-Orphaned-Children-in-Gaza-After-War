@@ -17,6 +17,7 @@ exports.createAssignment = async (req, res) => {
       notes
     });
 
+    
     res.status(201).json(newAssignment);
   } catch (err) {
     console.error(err);

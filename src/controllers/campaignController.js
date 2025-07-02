@@ -13,6 +13,7 @@ exports.createCampaign = async (req, res) => {
       return res.status(404).json({ error: 'Organization not found for this user.' });
     }
 
+    
     const campaign = await EmergencyCampaign.create({
       user_id: req.user.id,
       title,
@@ -36,24 +37,31 @@ exports.createCampaign = async (req, res) => {
         from: process.env.EMAIL,
         to: donor.email,
         subject: "🚨 New emergency campaign!",
-        text: `Dear ${donor.name},
+       html: `
+  <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; border-radius: 8px;">
+    <div style="max-width: 600px; margin: auto; background: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+      <h2 style="color: #d32f2f; text-align: center;">🚨 New Emergency Campaign Launched!</h2>
+      <p style="font-size: 16px; color: #333;">Dear <strong>${donor.name}</strong>,</p>
 
-We hope this message finds you well.
+      <p style="font-size: 16px; color: #555;">
+        We hope this message finds you well. A new <strong>Emergency Campaign</strong> has just been launched by the orphanage <strong style="color: #fbc02d;">${user.name}</strong>.
+      </p>
 
-A new **Emergency Campaign** has just been launched by the orphanage **${user.name}**.
+      <div style="background-color: #fff9c4; padding: 15px; border-radius: 8px; margin: 20px 0;">
+        <h3 style="margin: 0; color: #f57f17;">📌 Campaign Title: ${title}</h3>
+        <p style="margin: 5px 0 0;"><strong>📝 Description:</strong> ${description}</p>
+        <p style="margin: 5px 0 0;"><strong>🎯 Target Amount:</strong> <span style="color: green;">$${target_amount}</span></p>
+      </div>
 
-📌 **Campaign Title:** ${title}
-📝 **Description:** ${description}
-🎯 **Target Amount:** $${target_amount}
+      <p style="font-size: 16px; color: #444;">Your support can make a <strong>big difference</strong>.</p>
 
-Your support can make a big difference.
+      <a href="https://your-platform-link.com/campaigns" style="display: inline-block; padding: 12px 20px; background-color: #fbc02d; color: #000; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 15px;">🤝 Donate Now</a>
 
-Please consider donating and sharing this campaign with others who might help.
+      <p style="margin-top: 30px; font-size: 14px; color: #888;">Thank you for your continued generosity.<br/>— Supporting Orphaned Children Team</p>
+    </div>
+  </div>
+`,
 
-Thank you for your continued generosity!
-
-Best regards,  
-Supporting Orphaned Children Team`,
       };
 
       await transporter.sendMail(mailOptions);

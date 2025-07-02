@@ -11,6 +11,7 @@ const OrganizationVolunteer = sequelize.define('OrganizationVolunteer', {
     type: DataTypes.INTEGER,
     allowNull: false
   },
+  
   joined_at: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW

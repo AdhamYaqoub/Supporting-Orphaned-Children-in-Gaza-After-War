@@ -13,6 +13,7 @@ function setupDeliveryWebSocket(server) {
       ws.close(4001, "No token provided");
       return;
     }
+    
 
     let decoded;
     try {

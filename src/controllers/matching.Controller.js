@@ -18,6 +18,7 @@ async function matchVolunteersToRequest(req, res) {
       return res.status(404).json({ message: "لا يوجد متطوعون مناسبون" });
     }
 
+    
     await request.update({ status: "matched" });
 
     return res.status(200).json({

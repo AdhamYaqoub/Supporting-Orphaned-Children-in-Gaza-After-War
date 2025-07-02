@@ -11,6 +11,7 @@ exports.getStats = async (req, res) => {
     });
 
 
+    
     const donationsByCategory = await Donation.findAll({
       where: { user_id:userId },
       attributes: [

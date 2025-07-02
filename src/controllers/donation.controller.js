@@ -16,6 +16,7 @@ exports.createDonation = async (req, res) => {
         return res.status(404).json({ error: 'Campaign not found.' });
       }
 
+      
       if (campaign.status === 'completed') {
         return res.status(400).json({ error: 'This campaign has already been completed.' });
       }

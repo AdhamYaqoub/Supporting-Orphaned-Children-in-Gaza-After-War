@@ -12,6 +12,7 @@ router.get('/donations', uthorizeRoles(['admin']), donationController.getAllDona
 // Get donation by ID
 router.get('/donations/:donationId', uthorizeRoles(['admin']), donationController.getDonationById);
 
+
 // Update donation
 router.put('/donations/:donationId', uthorizeRoles(['donor']), donationController.updateDonation);
 

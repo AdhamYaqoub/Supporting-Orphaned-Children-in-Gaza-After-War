@@ -11,6 +11,7 @@ const Sponsorship = sequelize.define(
       allowNull: false,
       defaultValue: "financial",
     },
+    
     amount: DataTypes.FLOAT,
     start_date: DataTypes.DATE,
     end_date: DataTypes.DATE,

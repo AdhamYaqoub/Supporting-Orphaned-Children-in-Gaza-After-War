@@ -10,6 +10,7 @@ exports.applyToRequest = async (req, res) => {
     const userId = req.user.id;
     const { request_id, message } = req.body;
 
+    
     const volunteer = await Volunteer.findOne({ where: { user_id: userId } });
     if (!volunteer) {
       return res

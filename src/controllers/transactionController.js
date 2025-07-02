@@ -11,6 +11,7 @@ exports.getAllTransactions = async (req, res) => {
 };
 
 // Get transaction by ID
+
 exports.getTransactionById = async (req, res) => {
   try {
     const transaction = await Transaction.findByPk(req.params.transactionId);

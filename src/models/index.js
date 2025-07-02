@@ -16,6 +16,7 @@ const OrphanUpdate = require("./OrphanUpdate");
 User.hasMany(Donation, { foreignKey: "user_id", as: "userDonations" });
 Donation.belongsTo(User, { foreignKey: "user_id", as: "donorUser" });
 
+
 User.hasMany(Sponsorship, { foreignKey: "donor_id", as: "userSponsorships" });
 Sponsorship.belongsTo(User, { foreignKey: "donor_id", as: "sponsoringUser" });
 

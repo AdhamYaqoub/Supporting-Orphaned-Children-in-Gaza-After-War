@@ -12,3 +12,4 @@ router.put("/profile", authMiddleware, authController.updateProfile);
 router.delete("/:userId", authMiddleware, authController.deleteUser);
 
 module.exports = router;
+

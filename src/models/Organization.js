@@ -14,6 +14,7 @@ const Organization = sequelize.define('Organization', {
     verified: { type: DataTypes.BOOLEAN, defaultValue: false },
     created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
 },
+
 {
   timestamps: false, 
 }

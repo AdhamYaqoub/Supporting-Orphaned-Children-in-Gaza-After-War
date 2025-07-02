@@ -9,6 +9,7 @@ exports.createReview = async (req, res) => {
     }
 };
 
+
 exports.getReviews = async (req, res) => {
     try {
         const reviews = await Review.findAll();

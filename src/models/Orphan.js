@@ -16,4 +16,5 @@ const Orphan = sequelize.define('Orphan', {
   }
 );
 
+
 module.exports = Orphan;

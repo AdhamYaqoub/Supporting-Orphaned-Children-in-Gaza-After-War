@@ -14,6 +14,7 @@ router.get(
   volunteerController.getVolunteerById
 ); //
 router.put(
+  
   "/update",
   uthorizeRoles(["admin", "volunteer"]),
   volunteerController.updateVolunteer

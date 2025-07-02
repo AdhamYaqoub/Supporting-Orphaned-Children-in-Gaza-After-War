@@ -19,6 +19,7 @@ exports.getOrganizationById = async (req, res) => {
   }
 };
 
+
 exports.updateOrganization= async (req, res) => {
   const { organizationId } = req.params;
   const { name_orphanage, address, phone_number, contact_email, verified } = req.body;

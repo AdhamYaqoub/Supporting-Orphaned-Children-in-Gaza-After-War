@@ -16,4 +16,5 @@ const EmergencyCampaign = sequelize.define('EmergencyCampaign', {
 }
 );
 
+
 module.exports = EmergencyCampaign;

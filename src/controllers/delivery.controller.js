@@ -15,6 +15,7 @@ exports.assignVolunteerToDonation = async (req, res) => {
         error: "Only organizations can assign volunteers to donations.",
       });
     }
+    
     const userId = req.user.id;
     const Organization = await Organization.findOne({
       where: { user_id: userId },

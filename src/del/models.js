@@ -18,6 +18,7 @@
 //     education_status: DataTypes.STRING
 // });
 
+
 // const Donation = sequelize.define('Donation', {
 //     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
 //     amount: DataTypes.DECIMAL(10, 2),

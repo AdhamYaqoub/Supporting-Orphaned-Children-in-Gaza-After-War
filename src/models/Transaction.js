@@ -14,4 +14,5 @@ const Transaction = sequelize.define('Transaction', {
     timestamps: false,
 });
 
+
 module.exports = Transaction;

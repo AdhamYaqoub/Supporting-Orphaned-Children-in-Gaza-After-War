@@ -14,6 +14,7 @@ const authMiddleware = (req, res, next) => {
     }
 };
 
+
 module.exports = authMiddleware;
 // middlewares/auth.js
 // const jwt = require('jsonwebtoken');

@@ -18,6 +18,7 @@ const Volunteer = sequelize.define(
       type: DataTypes.ENUM("active", "inactive", "suspended"),
       defaultValue: "active", 
     },
+    
 
     latitude: { type: DataTypes.FLOAT },  
     longitude: { type: DataTypes.FLOAT },  

@@ -17,6 +17,7 @@ const VolunteerApplication = sequelize.define(
     },
   },
   {
+    
     timestamps: true,
   }
 );

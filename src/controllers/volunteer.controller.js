@@ -11,6 +11,7 @@ exports.getAllVolunteers = async (req, res) => {
   }
 };
 
+
 exports.getVolunteerById = async (req, res) => {
   try {
     const volunteer = await Volunteer.findByPk(req.params.volunteerId);

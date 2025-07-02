@@ -32,4 +32,5 @@ const OrphanUpdate = sequelize.define(
   }
 );
 
+
 module.exports = OrphanUpdate;

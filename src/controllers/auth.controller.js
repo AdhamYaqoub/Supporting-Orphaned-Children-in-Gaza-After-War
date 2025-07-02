@@ -57,6 +57,7 @@ exports.forgotPassword = async (req, res) => {
 http://localhost:5000/api/auth/reset-password/${resetToken}`,
     };
 
+    
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) return res.status(500).json({ error: "Error sending email" });
       res.json({ message: "Password reset link sent to email" });

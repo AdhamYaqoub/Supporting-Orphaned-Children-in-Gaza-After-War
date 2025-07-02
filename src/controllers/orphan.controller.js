@@ -17,6 +17,7 @@ exports.createOrphan = async (req, res) => {
       ...req.body,
       organization_id: organizationId,
     });
+    
     res.status(201).json(orphan);
   } catch (err) {
     res.status(400).json({ error: err.message });

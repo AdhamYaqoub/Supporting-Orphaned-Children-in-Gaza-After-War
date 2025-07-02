@@ -9,6 +9,7 @@ const Review = sequelize.define('Review', {
     created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
 },
 {
+  
   timestamps: false, 
 }
 );

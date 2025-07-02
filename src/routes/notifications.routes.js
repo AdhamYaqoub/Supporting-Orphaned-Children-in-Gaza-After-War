@@ -10,3 +10,4 @@ router.post("/notifications", authMiddleware, notificationController.sendNotific
 router.get("/notifications", authMiddleware, notificationController.getUserNotifications);
 
 module.exports = router;
+

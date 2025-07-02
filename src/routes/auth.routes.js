@@ -9,6 +9,7 @@ router.post("/refresh", authMiddleware, authController.refreshToken);
 // Forgot Password
 router.post("/forgot-password", authController.forgotPassword);
 
+
 // Reset Password Form
 router.get("/reset-password/:resetToken", authController.resetPasswordForm);
 

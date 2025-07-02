@@ -9,6 +9,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+
 transporter.sendMail({
   from: 'adhamyaqouc@gmail.com',
   to: 'amamry2021.2002@gmail.com', // جرّب ترسل لنفسك أولًا

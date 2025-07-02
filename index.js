@@ -28,6 +28,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true })); // يدعم البيانات القادمة من form
 app.use(express.json()); // يدعم البيانات القادمة بصيغة JSON
 
+
 // add routes
 app.use("/api/users", usersRoutes);
 app.use("/api/auth", authRoutes);

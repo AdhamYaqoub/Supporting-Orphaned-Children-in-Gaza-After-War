@@ -11,6 +11,7 @@ const Donation = sequelize.define('Donation', {
   donation_item: { type: DataTypes.STRING },          
   quantity: { type: DataTypes.INTEGER },              
 
+  
   category: {
     type: DataTypes.ENUM('general', 'education', 'medical', 'clothes', 'food'),
     allowNull: false,

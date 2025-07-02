@@ -9,3 +9,4 @@ router.put('/:organizationId',uthorizeRoles(['admin', 'orphanage']), organizatio
 router.delete('/:organizationId',uthorizeRoles(['admin']), organizationController.deleteOrganization);//
 
 module.exports = router;
+

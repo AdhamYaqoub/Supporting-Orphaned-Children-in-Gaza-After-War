@@ -16,6 +16,7 @@ exports.createUpdate = async (req, res) => {
       date: date || new Date(),
     });
 
+    
     res.status(201).json(newUpdate);
   } catch (err) {
     console.error("Create update error:", err);
