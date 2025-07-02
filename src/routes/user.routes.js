@@ -1,10 +1,15 @@
-// src/routes/userRoutes.js
-const express = require('express');
-const { getUsers, addUser } = require('../controllers/user.controller');  // استيراد الدوال من الـ controller
-
+const express = require("express");
 const router = express.Router();
+const authMiddleware = require("../middleware/auth");
+const authController = require("../controllers/user.controller");
 
-router.get('/users', getUsers);  // المسار لعرض جميع المستخدمين
-router.post('/users', addUser);  // المسار لإضافة مستخدم جديد
+router.post("/register", authController.register);
+router.post("/login", authController.login);
+router.post("/logout", authMiddleware, authController.logout);
+
+router.get("/profile", authMiddleware, authController.getProfile);
+router.put("/profile", authMiddleware, authController.updateProfile);
+router.delete("/:userId", authMiddleware, authController.deleteUser);
 
 module.exports = router;
+

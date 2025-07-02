@@ -12,8 +12,9 @@ const EmergencyCampaign = sequelize.define('EmergencyCampaign', {
     
 },
 {
-  timestamps: false, // منع إنشاء createdAt و updatedAt
+  timestamps: false, 
 }
 );
+
 
 module.exports = EmergencyCampaign;
